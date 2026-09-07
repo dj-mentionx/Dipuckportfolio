@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
+import { IBM_Plex_Mono, Syne } from "next/font/google";
 import "./globals.css";
 
-const serif = Source_Serif_4({
+const display = Syne({
   subsets: ["latin"],
-  variable: "--font-serif",
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -17,12 +17,11 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://dipuckjones.com"),
-  title: "Dipuck Jones — declassified",
-  description:
-    "A case file of what AI models currently say about Dipuck Jones, and a free AI visibility card for your own name.",
+  title: "Dipuck Jones — Unprompted",
+  description: "Ask the field what the models say. Then ask about yourself.",
   openGraph: {
-    title: "Dipuck Jones — declassified",
-    description: "Drag to declassify the file the models already keep.",
+    title: "Dipuck Jones — Unprompted",
+    description: "A live field of unasked questions.",
     type: "website",
     url: "/",
   },
@@ -30,8 +29,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${serif.variable} ${mono.variable}`}>
-      <body className="bg-paper font-serif text-ink antialiased">{children}</body>
+    <html lang="en" className={`${display.variable} ${mono.variable}`}>
+      <body className="bg-void font-display text-white antialiased">{children}</body>
     </html>
   );
 }

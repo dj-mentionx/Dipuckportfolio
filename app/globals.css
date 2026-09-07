@@ -4,20 +4,116 @@
 @tailwind components;
 @tailwind utilities;
 
-.redacted-overlay {
-  --mx: 50%;
-  --my: 50%;
-  -webkit-mask-image: radial-gradient(
-    circle 72px at var(--mx) var(--my),
-    transparent 98%,
-    #000 100%
-  );
-  mask-image: radial-gradient(circle 72px at var(--mx) var(--my), transparent 98%, #000 100%);
+.cinema {
+  position: relative;
+  min-height: 100dvh;
+  background: var(--void);
+  color: #fff;
 }
 
-@media (pointer: coarse), (prefers-reduced-motion: reduce) {
-  .redacted-overlay {
-    -webkit-mask-image: none;
-    mask-image: none;
+.cinema-hud {
+  position: fixed;
+  top: 4.5vh;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.25rem;
+}
+
+.cinema-stage {
+  position: relative;
+  z-index: 10;
+}
+
+.letterbox {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 3.6vh;
+  z-index: 30;
+  background: #000;
+  pointer-events: none;
+}
+
+.letterbox-top {
+  top: 0;
+}
+
+.letterbox-bottom {
+  bottom: 0;
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  pointer-events: none;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.hud-btn {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 0.45rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.72);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.hud-btn:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.voice-panel {
+  min-height: 12rem;
+  padding: 1.15rem 1.2rem 1.3rem;
+  background: rgba(6, 7, 10, 0.42);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.voice-gpt {
+  box-shadow: inset 3px 0 0 var(--gpt);
+}
+
+.voice-claude {
+  box-shadow: inset 3px 0 0 var(--claude);
+}
+
+.voice-gemini {
+  box-shadow: inset 3px 0 0 var(--gemini);
+}
+
+.voice-perplexity {
+  box-shadow: inset 3px 0 0 var(--perplexity);
+}
+
+.mention-lock {
+  color: var(--mention);
+  text-shadow: 0 0 18px rgba(255, 74, 42, 0.55);
+}
+
+.poster-card {
+  background: rgba(5, 6, 9, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+}
+
+.source-slab {
+  padding: 1.15rem 1.2rem 1.3rem;
+  background: rgba(7, 8, 12, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain {
+    display: none;
   }
 }

@@ -1,9 +1,5 @@
-import { CaseFile } from "@/components/CaseFile";
-import { getLatestMentions } from "@/lib/mentions";
+import { Experience } from "@/components/unprompted/Experience";
 
-export const revalidate = 3600;
-
-export default async function HomePage() {
-  const { mentions, source } = await getLatestMentions();
-  return <CaseFile mentions={mentions} source={source} />;
+export default function HomePage() {
+  return <Experience />;
 }
