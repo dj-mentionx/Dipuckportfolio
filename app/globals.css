@@ -1,0 +1,23 @@
+@import "./tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.redacted-overlay {
+  --mx: 50%;
+  --my: 50%;
+  -webkit-mask-image: radial-gradient(
+    circle 72px at var(--mx) var(--my),
+    transparent 98%,
+    #000 100%
+  );
+  mask-image: radial-gradient(circle 72px at var(--mx) var(--my), transparent 98%, #000 100%);
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .redacted-overlay {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}

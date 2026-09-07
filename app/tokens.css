@@ -1,0 +1,48 @@
+:root {
+  --paper: #ede8dd;
+  --ink: #14120f;
+  --redact: #0a0a0a;
+  --stamp: #b23a2f;
+  --verified: #3e6259;
+  --ink-muted: #8c8578;
+  --rule: rgba(20, 18, 15, 0.15);
+  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+body.has-custom-cursor,
+body.has-custom-cursor * {
+  cursor: none !important;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.hairline {
+  border: 1px solid var(--rule);
+}
+
+.hairline-b {
+  border-bottom: 1px solid var(--rule);
+}
+
+.hairline-t {
+  border-top: 1px solid var(--rule);
+}
