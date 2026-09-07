@@ -16,7 +16,6 @@ export default function Icon() {
           alignItems: "center",
           justifyContent: "center",
           fontSize: 16,
-          fontFamily: "Georgia, serif",
         }}
       >
         D
