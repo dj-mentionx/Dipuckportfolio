@@ -57,7 +57,7 @@ export function Splice({ result, pending, error, onSplice }: SpliceProps) {
               Copy frame
             </button>
             <a
-              href={`/api/og?name=${encodeURIComponent(result.name)}&score=${result.score}&mentioned=${result.mentioned ? "1" : "0"}`}
+              href={`/api/og?name=${encodeURIComponent(result.name)}&score=${result.score}&mentioned=${result.mentioned ? "1" : "0"}&v=rushes`}
             >
               Open still
             </a>

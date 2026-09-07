@@ -30,22 +30,7 @@
 }
 
 .gate {
-  position: sticky;
-  top: 18vh;
-  z-index: 5;
-  height: 0;
-  pointer-events: none;
-}
-
-.gate::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(78vw, 720px);
-  height: 58vh;
-  border: 2px solid rgba(240, 194, 122, 0.35);
-  box-shadow: 0 0 0 100vw rgba(0, 0, 0, 0.28);
+  display: none;
 }
 
 .film-scroller {
