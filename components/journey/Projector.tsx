@@ -32,10 +32,13 @@ export function Projector({ roomId, onClose }: ProjectorProps) {
   const last = slide === room.slides.length - 1;
 
   return (
-    <motion.div className="room" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      <div className="room-dark" onClick={onClose} />
-      <div className="beam" aria-hidden />
-      <div className="screen-wrap">
+    <motion.div className="theater" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="theater-plate" src="/art/plate-projector.png" alt="" />
+      <button type="button" className="theater-exit" onClick={onClose}>
+        Exit
+      </button>
+      <div className="projected">
         <p className="room-label">
           {room.house} · {room.door} · {slide + 1}/{room.slides.length}
         </p>
@@ -43,10 +46,10 @@ export function Projector({ roomId, onClose }: ProjectorProps) {
           <motion.article
             key={`${room.id}-${slide}`}
             className="screen"
-            initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: -10, filter: "blur(6px)" }}
-            transition={{ duration: 0.45 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
           >
             <p className="screen-kicker">{current.kicker}</p>
             {current.figure ? <p className="screen-figure">{current.figure}</p> : null}
@@ -66,14 +69,8 @@ export function Projector({ roomId, onClose }: ProjectorProps) {
           <button type="button" onClick={() => setSlide((n) => Math.max(0, n - 1))} disabled={slide === 0}>
             Prev
           </button>
-          <button
-            type="button"
-            onClick={() => (last ? onClose() : setSlide((n) => n + 1))}
-          >
+          <button type="button" onClick={() => (last ? onClose() : setSlide((n) => n + 1))}>
             {last ? "Leave room" : "Next reel"}
-          </button>
-          <button type="button" className="ghost" onClick={onClose}>
-            Exit
           </button>
         </div>
       </div>

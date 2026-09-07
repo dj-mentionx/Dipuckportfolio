@@ -6,7 +6,7 @@ import { Projector } from "./Projector";
 import { World } from "./World";
 import type { RoomId } from "@/lib/rooms";
 
-const MAX = 2400;
+const MAX = 2800;
 
 export function Experience() {
   const [x, setX] = useState(0);
@@ -15,7 +15,7 @@ export function Experience() {
   const start = useRef({ x: 0, scroll: 0 });
 
   const progress = x / MAX;
-  const chapter = progress < 0.28 ? "FOREST" : progress < 0.62 ? "VILLAGE" : "CITY";
+  const chapter = progress < 0.3 ? "FOREST" : progress < 0.66 ? "VILLAGE" : "CITY";
 
   const move = useCallback((delta: number) => {
     setX((value) => Math.max(0, Math.min(MAX, value + delta)));
@@ -29,8 +29,8 @@ export function Experience() {
     };
     const onKey = (event: KeyboardEvent) => {
       if (room) return;
-      if (event.key === "ArrowRight" || event.key === " ") move(90);
-      if (event.key === "ArrowLeft") move(-90);
+      if (event.key === "ArrowRight" || event.key === " ") move(110);
+      if (event.key === "ArrowLeft") move(-110);
     };
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("keydown", onKey);
@@ -40,15 +40,9 @@ export function Experience() {
     };
   }, [move, room]);
 
-  const sky = skyFor(progress);
-
   return (
     <div
       className="picture"
-      style={{
-        ["--sky-a" as string]: sky.a,
-        ["--sky-b" as string]: sky.b,
-      }}
       onPointerDown={(event) => {
         if (room) return;
         dragging.current = true;
@@ -57,7 +51,7 @@ export function Experience() {
       }}
       onPointerMove={(event) => {
         if (!dragging.current || room) return;
-        setX(Math.max(0, Math.min(MAX, start.current.scroll - (event.clientX - start.current.x) * 1.35)));
+        setX(Math.max(0, Math.min(MAX, start.current.scroll - (event.clientX - start.current.x) * 1.4)));
       }}
       onPointerUp={() => {
         dragging.current = false;
@@ -74,7 +68,7 @@ export function Experience() {
 
       <World progress={progress} onOpen={setRoom} />
 
-      {progress < 0.18 ? (
+      {progress < 0.16 ? (
         <div className="open-titles">
           <p>A picture in three movements</p>
           <h1>From the trees to the city</h1>
@@ -83,20 +77,14 @@ export function Experience() {
       ) : null}
 
       <div className="reel">
-        <span className={progress < 0.28 ? "on" : ""}>Forest</span>
+        <span className={progress < 0.3 ? "on" : ""}>Forest</span>
         <i />
-        <span className={progress >= 0.28 && progress < 0.62 ? "on" : ""}>Village</span>
+        <span className={progress >= 0.3 && progress < 0.66 ? "on" : ""}>Village</span>
         <i />
-        <span className={progress >= 0.62 ? "on" : ""}>City</span>
+        <span className={progress >= 0.66 ? "on" : ""}>City</span>
       </div>
 
       <AnimatePresence>{room ? <Projector roomId={room} onClose={() => setRoom(null)} /> : null}</AnimatePresence>
     </div>
   );
-}
-
-function skyFor(progress: number) {
-  if (progress < 0.35) return { a: "#07140f", b: "#10261c" };
-  if (progress < 0.65) return { a: "#1a120e", b: "#3b2416" };
-  return { a: "#070b14", b: "#151d30" };
 }
