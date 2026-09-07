@@ -56,6 +56,9 @@ export function Experience() {
       onPointerUp={() => {
         dragging.current = false;
       }}
+      onPointerCancel={() => {
+        dragging.current = false;
+      }}
     >
       <div className="letterbox top" />
       <div className="letterbox bottom" />

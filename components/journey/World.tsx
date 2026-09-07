@@ -16,7 +16,7 @@ const DOORS: { id: RoomId; label: string; house: string }[] = [
 ];
 
 export function World({ progress, onOpen }: WorldProps) {
-  const inCity = progress > 0.68;
+  const inCity = progress > 0.55;
   const shift = progress * 200;
 
   return (
@@ -27,7 +27,13 @@ export function World({ progress, onOpen }: WorldProps) {
         <Plate src="/art/plate-city.png" alt="Night city of cinema houses">
           <div className={`marquee-row ${inCity ? "is-lit" : ""}`}>
             {DOORS.map((door) => (
-              <button key={door.id} type="button" disabled={!inCity} onClick={() => onOpen(door.id)}>
+              <button
+                key={door.id}
+                type="button"
+                disabled={!inCity}
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={() => onOpen(door.id)}
+              >
                 <b>{door.label}</b>
                 <span>{door.house}</span>
               </button>
