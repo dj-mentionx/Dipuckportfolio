@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { CaseFooter } from "./CaseFooter";
 import { CustomCursor } from "./CustomCursor";
 import { DocketHeader } from "./DocketHeader";
@@ -16,15 +16,18 @@ type CaseFileProps = {
 };
 
 export function CaseFile({ mentions, source }: CaseFileProps) {
-  const [score, setScore] = useState(0);
   const [opened, setOpened] = useState<string[]>([]);
 
-  const onReveal = useCallback((id: string, delta: number) => {
-    setOpened((current) => {
-      if (current.includes(id)) return current;
-      setScore((value) => value + delta);
-      return [...current, id];
-    });
+  const score = useMemo(
+    () =>
+      mentions
+        .filter((mention) => opened.includes(mention.id))
+        .reduce((sum, mention) => sum + mention.scoreDelta, 0),
+    [mentions, opened],
+  );
+
+  const onReveal = useCallback((id: string) => {
+    setOpened((current) => (current.includes(id) ? current : [...current, id]));
   }, []);
 
   return (

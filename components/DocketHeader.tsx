@@ -7,9 +7,14 @@ type DocketHeaderProps = {
 export function DocketHeader({ source }: DocketHeaderProps) {
   return (
     <header className="relative hairline-b pb-10 pt-4">
-      <Stamp />
+      <div className="mb-4 flex justify-end sm:hidden">
+        <Stamp />
+      </div>
+      <div className="hidden sm:block">
+        <Stamp />
+      </div>
       <p className="font-mono text-[10px] text-ink-muted">File no. DJ–2012–2026</p>
-      <h1 className="mt-5 max-w-xl font-serif text-[2.35rem] leading-[1.1] sm:text-5xl">
+      <h1 className="mt-5 max-w-xl pr-0 font-serif text-[2.35rem] leading-[1.1] sm:pr-36 sm:text-5xl">
         Dipuck Jones
       </h1>
       <p className="mt-3 max-w-md font-serif text-lg leading-relaxed text-ink">

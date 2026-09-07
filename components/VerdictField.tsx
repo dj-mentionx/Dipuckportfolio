@@ -14,7 +14,7 @@ const SCATTER = [
 
 type VerdictFieldProps = {
   mentions: Mention[];
-  onReveal: (id: string, delta: number) => void;
+  onReveal: (id: string) => void;
 };
 
 export function VerdictField({ mentions, onReveal }: VerdictFieldProps) {

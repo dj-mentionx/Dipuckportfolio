@@ -8,7 +8,7 @@ export function Stamp() {
   return (
     <motion.div
       aria-hidden
-      className="pointer-events-none absolute -right-2 top-6 select-none sm:right-6 sm:top-4"
+      className="pointer-events-none relative select-none sm:absolute sm:-right-2 sm:top-4 lg:right-6"
       initial={reduce ? false : { scale: 2.1, rotate: -22, y: -72, opacity: 0 }}
       animate={{ scale: 1, rotate: -8, y: 0, opacity: 1 }}
       transition={

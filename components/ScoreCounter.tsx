@@ -23,8 +23,8 @@ export function ScoreCounter({ score, scanned, total }: ScoreCounterProps) {
       <p className="font-mono text-[10px] text-ink-muted">AI visibility score</p>
       <div className="mt-1 flex items-baseline gap-3">
         <motion.span className="font-mono text-3xl leading-none text-stamp">{display}</motion.span>
-        <span className="font-mono text-[10px] text-ink-muted">
-          {scanned}/{total} files opened
+        <span className="font-mono text-[10px] text-ink-muted whitespace-nowrap">
+          {scanned} / {total} opened
         </span>
       </div>
     </aside>

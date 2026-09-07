@@ -9,7 +9,7 @@ type VerdictCardProps = {
   mention: Mention;
   rotate: number;
   shift: string;
-  onReveal: (id: string, delta: number) => void;
+  onReveal: (id: string) => void;
 };
 
 const BAR_WIDTHS = [92, 78, 86, 64, 88, 71, 80];
@@ -35,7 +35,7 @@ export function VerdictCard({ mention, rotate, shift, onReveal }: VerdictCardPro
     if (revealedRef.current) return;
     revealedRef.current = true;
     setRevealed(true);
-    onReveal(mention.id, mention.scoreDelta);
+    onReveal(mention.id);
   };
 
   const updateMask = (clientX: number, clientY: number) => {
@@ -105,7 +105,7 @@ export function VerdictCard({ mention, rotate, shift, onReveal }: VerdictCardPro
               : "Subject not named"
             : "Redacted"}
         </span>
-        <span className="text-ink-muted">{revealed ? `+${mention.scoreDelta}` : "held"}</span>
+        <span className="text-ink-muted">{revealed ? `+${mention.scoreDelta}` : ""}</span>
       </footer>
     </article>
   );
