@@ -14,17 +14,17 @@ export default function OpenGraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          backgroundColor: "#0B0907",
-          color: "#EFE6D4",
+          backgroundColor: "#07140f",
+          color: "#F3EAD8",
           padding: 64,
         }}
       >
-        <div style={{ display: "flex", fontSize: 20, letterSpacing: 6, color: "#8A7D6B" }}>RUSHES · 35MM</div>
+        <div style={{ display: "flex", fontSize: 20, letterSpacing: 6, color: "#B7AA93" }}>FOREST · VILLAGE · CITY</div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 80, lineHeight: 0.95 }}>Dipuck Jones</div>
-          <div style={{ marginTop: 16, fontSize: 32, color: "#F0C27A" }}>Thirteen years. One print. Scrub.</div>
+          <div style={{ fontSize: 72, lineHeight: 0.95 }}>Dipuck Jones</div>
+          <div style={{ marginTop: 18, fontSize: 30, color: "#F0C27A" }}>Scroll sideways. The land evolves.</div>
         </div>
-        <div style={{ display: "flex", fontSize: 20, color: "#FF3B2F" }}>SCENE 01 · TAKE 13 · BERLIN</div>
+        <div style={{ display: "flex", fontSize: 20 }}>ABOUT · EXP · BOMB · CONTACT</div>
       </div>
     ),
     size,

@@ -17,14 +17,14 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://dipuckjones.com"),
-  title: "Dipuck Jones — Rushes",
-  description: "Thirteen years as a print. Scrub the film. Splice your name onto the leader.",
+  title: "Dipuck Jones — From the trees to the city",
+  description: "A sideways picture: forest, village, city. Then four rooms on a projector.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${mono.variable}`}>
-      <body className="bg-[#0b0907] font-display antialiased">{children}</body>
+      <body className="font-display antialiased">{children}</body>
     </html>
   );
 }

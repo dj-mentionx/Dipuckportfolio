@@ -1,4 +1,4 @@
-import { Experience } from "@/components/rushes/Experience";
+import { Experience } from "@/components/journey/Experience";
 
 export default function HomePage() {
   return <Experience />;

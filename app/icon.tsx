@@ -10,15 +10,15 @@ export default function Icon() {
         style={{
           width: 32,
           height: 32,
-          background: "#0B0907",
+          background: "#07140f",
           color: "#F0C27A",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: 16,
+          fontSize: 14,
         }}
       >
-        R
+        DJ
       </div>
     ),
     size,

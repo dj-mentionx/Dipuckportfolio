@@ -1,10 +1,10 @@
 :root {
-  --bay: #14110e;
-  --bay-deep: #0b0907;
-  --tungsten: #f0c27a;
-  --china: #ff3b2f;
-  --print: #efe6d4;
-  --mute: #8a7d6b;
+  --sky-a: #07140f;
+  --sky-b: #10261c;
+  --print: #f3ead8;
+  --mute: #b7aa93;
+  --amber: #f0c27a;
+  --neon: #ff4d3a;
   --font-display: "Fraunces", Georgia, serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
@@ -15,13 +15,14 @@
 
 html,
 body {
-  min-height: 100%;
   margin: 0;
-  background: var(--bay-deep);
+  min-height: 100%;
+  background: #05070a;
   color: var(--print);
+  overflow: hidden;
 }
 
 ::selection {
-  background: var(--china);
+  background: var(--neon);
   color: #fff;
 }
