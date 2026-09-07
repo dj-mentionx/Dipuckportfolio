@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 function clamp(value: string | null, fallback: string, max = 48): string {
   return (value || fallback).trim().slice(0, max);
