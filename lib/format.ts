@@ -17,9 +17,8 @@ export function visibilityBlocks(score: number): string {
 
 export function shareText(name: string, score: number, mentioned: boolean): string {
   return [
-    `AI visibility — ${name}`,
-    `${visibilityBlocks(score)}  ${score}`,
-    `Mentioned: ${mentioned ? "yes" : "no"}`,
+    `RUSHES — ${name}`,
+    `TAKE ${score} · ${mentioned ? "IN SYNC" : "WILD SOUND"}`,
     "scanned via dipuckjones.com",
   ].join("\n");
 }

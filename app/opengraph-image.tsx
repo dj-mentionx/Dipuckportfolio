@@ -14,24 +14,17 @@ export default function OpenGraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          backgroundColor: "#07080c",
-          color: "#F4F1EA",
+          backgroundColor: "#0B0907",
+          color: "#EFE6D4",
           padding: 64,
         }}
       >
-        <div style={{ display: "flex", fontSize: 18, letterSpacing: 6, color: "rgba(255,255,255,0.45)" }}>
-          UNPROMPTED
-        </div>
+        <div style={{ display: "flex", fontSize: 20, letterSpacing: 6, color: "#8A7D6B" }}>RUSHES · 35MM</div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 72, lineHeight: 1.05 }}>Ask the field.</div>
-          <div style={{ marginTop: 16, fontSize: 28, color: "rgba(255,255,255,0.6)", maxWidth: 800 }}>
-            Four models. One question. Then ask about yourself.
-          </div>
+          <div style={{ fontSize: 80, lineHeight: 0.95 }}>Dipuck Jones</div>
+          <div style={{ marginTop: 16, fontSize: 32, color: "#F0C27A" }}>Thirteen years. One print. Scrub.</div>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", color: "#FF4A2A", fontSize: 20 }}>
-          <div style={{ display: "flex" }}>dipuckjones.com</div>
-          <div style={{ display: "flex" }}>LIVE</div>
-        </div>
+        <div style={{ display: "flex", fontSize: 20, color: "#FF3B2F" }}>SCENE 01 · TAKE 13 · BERLIN</div>
       </div>
     ),
     size,

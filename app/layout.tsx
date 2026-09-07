@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Syne } from "next/font/google";
+import { Fraunces, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-const display = Syne({
+const display = Fraunces({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
@@ -17,20 +17,14 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://dipuckjones.com"),
-  title: "Dipuck Jones — Unprompted",
-  description: "Ask the field what the models say. Then ask about yourself.",
-  openGraph: {
-    title: "Dipuck Jones — Unprompted",
-    description: "A live field of unasked questions.",
-    type: "website",
-    url: "/",
-  },
+  title: "Dipuck Jones — Rushes",
+  description: "Thirteen years as a print. Scrub the film. Splice your name onto the leader.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${mono.variable}`}>
-      <body className="bg-void font-display text-white antialiased">{children}</body>
+      <body className="bg-[#0b0907] font-display antialiased">{children}</body>
     </html>
   );
 }

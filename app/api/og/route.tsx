@@ -11,7 +11,6 @@ export async function GET(req: Request) {
   const name = clamp(searchParams.get("name"), "Untitled");
   const score = Math.max(0, Math.min(99, Number(searchParams.get("score") || 0) || 0));
   const mentioned = searchParams.get("mentioned") === "1";
-  const filled = Math.max(0, Math.min(10, Math.round(score / 10)));
 
   return new ImageResponse(
     (
@@ -21,35 +20,30 @@ export async function GET(req: Request) {
           height: 630,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
-          backgroundColor: "#07080c",
-          color: "#F4F1EA",
-          padding: 64,
+          backgroundColor: "#0B0907",
+          color: "#EFE6D4",
+          padding: 48,
         }}
       >
-        <div style={{ display: "flex", width: "100%", justifyContent: "space-between", fontSize: 20 }}>
-          <div style={{ display: "flex" }}>ONE SHEET</div>
-          <div style={{ display: "flex", color: "#FF4A2A" }}>{mentioned ? "NAMED" : "0 MENTIONS"}</div>
+        <div style={{ display: "flex", justifyContent: "space-between", height: 28 }}>
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} style={{ display: "flex", width: 28, height: 18, backgroundColor: "#1B1712" }} />
+          ))}
         </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ display: "flex", fontSize: 64, lineHeight: 1.05 }}>{name}</div>
-          <div style={{ display: "flex", marginTop: 28, alignItems: "center" }}>
-            <div style={{ display: "flex", width: 22, height: 28, backgroundColor: filled > 0 ? "#FF4A2A" : "#2A2C33", marginRight: 8 }} />
-            <div style={{ display: "flex", width: 22, height: 28, backgroundColor: filled > 1 ? "#FF4A2A" : "#2A2C33", marginRight: 8 }} />
-            <div style={{ display: "flex", width: 22, height: 28, backgroundColor: filled > 2 ? "#FF4A2A" : "#2A2C33", marginRight: 8 }} />
-            <div style={{ display: "flex", width: 22, height: 28, backgroundColor: filled > 3 ? "#FF4A2A" : "#2A2C33", marginRight: 8 }} />
-            <div style={{ display: "flex", width: 22, height: 28, backgroundColor: filled > 4 ? "#FF4A2A" : "#2A2C33", marginRight: 8 }} />
-            <div style={{ display: "flex", width: 22, height: 28, backgroundColor: filled > 5 ? "#FF4A2A" : "#2A2C33", marginRight: 8 }} />
-            <div style={{ display: "flex", width: 22, height: 28, backgroundColor: filled > 6 ? "#FF4A2A" : "#2A2C33", marginRight: 8 }} />
-            <div style={{ display: "flex", width: 22, height: 28, backgroundColor: filled > 7 ? "#FF4A2A" : "#2A2C33", marginRight: 8 }} />
-            <div style={{ display: "flex", width: 22, height: 28, backgroundColor: filled > 8 ? "#FF4A2A" : "#2A2C33", marginRight: 8 }} />
-            <div style={{ display: "flex", width: 22, height: 28, backgroundColor: filled > 9 ? "#FF4A2A" : "#2A2C33", marginRight: 8 }} />
-            <div style={{ display: "flex", marginLeft: 12, fontSize: 36 }}>{String(score)}</div>
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "center", padding: "20px 12px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 20, color: "#8A7D6B" }}>
+            <div style={{ display: "flex" }}>RUSHES · TAKE {String(score)}</div>
+            <div style={{ display: "flex", color: "#FF3B2F" }}>{mentioned ? "IN SYNC" : "WILD SOUND"}</div>
+          </div>
+          <div style={{ display: "flex", fontSize: 72, marginTop: 24 }}>{name}</div>
+          <div style={{ display: "flex", marginTop: 18, fontSize: 28, color: "#F0C27A" }}>
+            {mentioned ? "HIT" : "MISS"} · scanned via dipuckjones.com
           </div>
         </div>
-        <div style={{ display: "flex", width: "100%", justifyContent: "space-between", fontSize: 20, color: "rgba(255,255,255,0.45)" }}>
-          <div style={{ display: "flex" }}>UNPROMPTED</div>
-          <div style={{ display: "flex" }}>scanned via dipuckjones.com</div>
+        <div style={{ display: "flex", justifyContent: "space-between", height: 28 }}>
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} style={{ display: "flex", width: 28, height: 18, backgroundColor: "#1B1712" }} />
+          ))}
         </div>
       </div>
     ),

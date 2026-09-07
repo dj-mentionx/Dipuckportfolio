@@ -1,11 +1,11 @@
 :root {
-  --void: #07080c;
-  --mention: #ff4a2a;
-  --gpt: #ece8e0;
-  --claude: #cba56a;
-  --gemini: #8b93ff;
-  --perplexity: #7e9aa3;
-  --font-display: "Syne", sans-serif;
+  --bay: #14110e;
+  --bay-deep: #0b0907;
+  --tungsten: #f0c27a;
+  --china: #ff3b2f;
+  --print: #efe6d4;
+  --mute: #8a7d6b;
+  --font-display: "Fraunces", Georgia, serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 
@@ -15,17 +15,13 @@
 
 html,
 body {
-  background: var(--void);
-  color: #fff;
   min-height: 100%;
-}
-
-body {
   margin: 0;
-  overflow-x: hidden;
+  background: var(--bay-deep);
+  color: var(--print);
 }
 
 ::selection {
-  background: var(--mention);
+  background: var(--china);
   color: #fff;
 }
