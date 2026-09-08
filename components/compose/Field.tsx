@@ -21,7 +21,7 @@ export function Field({ highlight, onPick }: FieldProps) {
   const ghostRef = useRef<HTMLDivElement>(null);
   const faceRef = useRef<HTMLButtonElement>(null);
   const burnsRef = useRef<HTMLDivElement>(null);
-  const exposure = useRef(0.08);
+  const exposure = useRef(0.05);
   const burns = useRef<Burn[]>([]);
   const lastBurn = useRef<Map<string, number>>(new Map());
   const mouse = useRef({ x: 0.5, y: 0.5, vx: 0, vy: 0 });
@@ -141,11 +141,15 @@ export function Field({ highlight, onPick }: FieldProps) {
           a.vx += (w / 2 - a.x) * 0.00011;
           a.vy += (h / 2 - a.y) * 0.00011;
           const cdx = a.x - w / 2;
-          const cdy = a.y - h / 2;
+          const cdy = a.y - h * 0.48;
           const cd = Math.max(24, Math.hypot(cdx, cdy));
-          if (cd < 88) {
-            a.vx += (cdx / cd) * 0.38;
-            a.vy += (cdy / cd) * 0.38;
+          const printR = Math.min(w * 0.17, 160);
+          if (cd < printR * 0.42) {
+            a.vx += (cdx / cd) * 0.34;
+            a.vy += (cdy / cd) * 0.34;
+          } else if (cd < printR * 1.28) {
+            a.vx += (-cdy / cd) * 0.22;
+            a.vy += (cdx / cd) * 0.22;
           }
           a.vx += Math.cos(t * 0.85 + i) * 0.03;
           a.vy += Math.sin(t * 0.7 + i * 0.9) * 0.03;
@@ -284,8 +288,8 @@ export function Field({ highlight, onPick }: FieldProps) {
         const wrapBox = wrap.getBoundingClientRect();
         const fx = (mx - (box.left - wrapBox.left)) / Math.max(1, box.width);
         const fy = (my - (box.top - wrapBox.top)) / Math.max(1, box.height);
-        const onFace = fx > -0.05 && fx < 1.05 && fy > -0.05 && fy < 1.05;
-        exposure.current = Math.min(1, Math.max(0.06, exposure.current + (onFace ? 0.038 : -0.02)));
+        const onFace = Math.hypot(fx - 0.5, fy - 0.5) < 0.56;
+        exposure.current = Math.min(1, Math.max(0.05, exposure.current + (onFace ? 0.07 : -0.045)));
         face.style.setProperty("--lx", `${fx * 100}%`);
         face.style.setProperty("--ly", `${fy * 100}%`);
         face.style.setProperty("--ex", String(exposure.current));
@@ -304,7 +308,11 @@ export function Field({ highlight, onPick }: FieldProps) {
           const t2x = faceCx + Math.cos(fromC - offset) * faceR;
           const t2y = faceCy + Math.sin(fromC - offset) * faceR;
           ctx.save();
-          ctx.fillStyle = `rgba(225, 6, 0, ${(0.11 + exposure.current * 0.16) * (1 - beam / 560)})`;
+          const lamp = (0.2 + exposure.current * 0.22) * (1 - beam / 560);
+          const beamGrad = ctx.createLinearGradient(mx, my, faceCx, faceCy);
+          beamGrad.addColorStop(0, `rgba(225, 6, 0, ${Math.min(0.55, lamp + 0.18)})`);
+          beamGrad.addColorStop(1, `rgba(225, 6, 0, ${lamp * 0.35})`);
+          ctx.fillStyle = beamGrad;
           ctx.beginPath();
           ctx.moveTo(mx, my);
           ctx.lineTo(t1x, t1y);
@@ -313,8 +321,8 @@ export function Field({ highlight, onPick }: FieldProps) {
           ctx.closePath();
           ctx.fill();
           ctx.beginPath();
-          ctx.fillStyle = `rgba(225, 6, 0, ${0.12 + exposure.current * 0.2})`;
-          ctx.arc(faceCx, faceCy, faceR * (0.55 + exposure.current * 0.2), 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(225, 6, 0, ${0.16 + exposure.current * 0.28})`;
+          ctx.arc(faceCx, faceCy, faceR * (0.5 + exposure.current * 0.28), 0, Math.PI * 2);
           ctx.fill();
           ctx.restore();
           ctx.beginPath();
@@ -375,9 +383,17 @@ export function Field({ highlight, onPick }: FieldProps) {
           const aberr = Math.min(10, speedN * 1.1);
           el.style.transform = `translate3d(${body.x}px, ${body.y}px, 0) translate(-50%, -50%) skewX(${skew}deg) scale(${stretch * zoom}, ${(1 / stretch) * zoom})`;
           el.style.textShadow = `${-aberr}px 0 0 rgba(225, 6, 0, 0.7), ${aberr}px 0 0 rgba(255, 255, 255, 0.28), 0 0 22px rgba(5,5,7,0.85)`;
-          el.style.opacity = onPrint ? "0.28" : "1";
-          if (onPrint) el.style.zIndex = body.y < faceCy + faceR * 0.12 ? "3" : "6";
-          else el.style.zIndex = body.y < faceCy ? "3" : "5";
+          const behind = body.y < faceCy + faceR * 0.1;
+          if (onPrint && behind) {
+            el.style.zIndex = "3";
+            el.style.opacity = "1";
+          } else if (onPrint) {
+            el.style.zIndex = "6";
+            el.style.opacity = "0.22";
+          } else {
+            el.style.zIndex = behind ? "3" : "5";
+            el.style.opacity = "1";
+          }
         }
       } else {
         const faceMid = h * 0.48;
