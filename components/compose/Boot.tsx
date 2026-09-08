@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Portrait } from "./Portrait";
 
 type BootProps = {
   onDone: () => void;
@@ -60,6 +61,17 @@ export function Boot({ onDone }: BootProps) {
       />
       <p className="boot__kicker">LIVE TITLE SEQUENCE · BERLIN</p>
 
+      {named ? (
+        <motion.div
+          className="boot__face"
+          initial={{ opacity: 0, scale: 1.08 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <Portrait />
+        </motion.div>
+      ) : null}
+
       <AnimatePresence>
         {!named ? (
           <motion.div
@@ -93,7 +105,7 @@ export function Boot({ onDone }: BootProps) {
                   </motion.span>
                 ))}
               </span>
-              <span className="boot__row boot__row--lime">
+              <span className="boot__row boot__row--red">
                 {JONES.map((ch, i) => (
                   <motion.span
                     key={`j-${ch}-${i}`}

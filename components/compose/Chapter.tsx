@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { CHAPTERS, type ChapterId } from "@/lib/compose";
 import { EXHIBITS } from "@/lib/exhibits";
 import { CountUp } from "./CountUp";
+import { Portrait } from "./Portrait";
 import { Scramble } from "./Scramble";
 
 type ChapterProps = {
@@ -65,6 +66,16 @@ export function Chapter({ id, onClose, onScan }: ChapterProps) {
           {id === "about" ? <CountUp to={13} /> : data.figure}
         </p>
         <p className="chapter__kicker">{data.kicker}</p>
+        {id === "about" ? (
+          <motion.div
+            className="chapter__face"
+            initial={{ clipPath: "inset(100% 0 0 0)", opacity: 0 }}
+            animate={{ clipPath: "inset(0% 0 0 0)", opacity: 1 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Portrait />
+          </motion.div>
+        ) : null}
         <KineticTitle text={data.title} />
         {data.lines.map((line, index) => (
           <p key={line} className="chapter__copy">

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { NODES, type FieldNode } from "@/lib/compose";
+import { Portrait } from "./Portrait";
 
 type Body = FieldNode & { x: number; y: number; vx: number; vy: number };
 
@@ -133,6 +134,13 @@ export function Field({ highlight, onPick }: FieldProps) {
           }
           a.vx += (w / 2 - a.x) * 0.00011;
           a.vy += (h / 2 - a.y) * 0.00011;
+          const cdx = a.x - w / 2;
+          const cdy = a.y - h / 2;
+          const cd = Math.max(24, Math.hypot(cdx, cdy));
+          if (cd < 168) {
+            a.vx += (cdx / cd) * 0.62;
+            a.vy += (cdy / cd) * 0.62;
+          }
           a.vx += Math.cos(t * 0.85 + i) * 0.03;
           a.vy += Math.sin(t * 0.7 + i * 0.9) * 0.03;
           for (let j = i + 1; j < list.length; j += 1) {
@@ -165,7 +173,7 @@ export function Field({ highlight, onPick }: FieldProps) {
         if (spark.y > 1) spark.y = 0;
         if (spark.x < 0) spark.x = 1;
         if (spark.x > 1) spark.x = 0;
-        ctx.fillStyle = "rgba(200, 245, 66, 0.22)";
+        ctx.fillStyle = "rgba(225, 6, 0, 0.22)";
         ctx.fillRect(spark.x * w, spark.y * h, 1.6, 1.6);
       }
 
@@ -175,7 +183,7 @@ export function Field({ highlight, onPick }: FieldProps) {
           const d = Math.hypot(list[i].x - list[j].x, list[i].y - list[j].y);
           if (d < 200) {
             ctx.globalAlpha = (1 - d / 200) * 0.5;
-            ctx.strokeStyle = "#c8f542";
+            ctx.strokeStyle = "#e10600";
             ctx.beginPath();
             ctx.moveTo(list[i].x, list[i].y);
             const cx = (list[i].x + list[j].x) / 2 + Math.sin(t + i) * 16;
@@ -190,7 +198,7 @@ export function Field({ highlight, onPick }: FieldProps) {
       const ranked = [...list].sort((a, b) => Math.hypot(a.x - mx, a.y - my) - Math.hypot(b.x - mx, b.y - my));
       for (const node of ranked.slice(0, 3)) {
         const d = Math.hypot(node.x - mx, node.y - my);
-        ctx.strokeStyle = `rgba(200, 245, 66, ${Math.max(0.15, 1 - d / 420)})`;
+        ctx.strokeStyle = `rgba(225, 6, 0, ${Math.max(0.15, 1 - d / 420)})`;
         ctx.lineWidth = 1.4;
         ctx.beginPath();
         ctx.moveTo(mx, my);
@@ -203,7 +211,7 @@ export function Field({ highlight, onPick }: FieldProps) {
       if (trail.current.length > 22) trail.current.shift();
       if (trail.current.length > 1) {
         ctx.beginPath();
-        ctx.strokeStyle = "rgba(200, 245, 66, 0.5)";
+        ctx.strokeStyle = "rgba(225, 6, 0, 0.5)";
         ctx.lineWidth = 2.4;
         trail.current.forEach((p, i) => {
           if (i === 0) ctx.moveTo(p.x, p.y);
@@ -216,7 +224,7 @@ export function Field({ highlight, onPick }: FieldProps) {
       const speed = Math.min(1.8, Math.hypot(mvx, mvy) / 18);
       ctx.save();
       ctx.translate(mx, my);
-      ctx.strokeStyle = "rgba(200, 245, 66, 0.9)";
+      ctx.strokeStyle = "rgba(225, 6, 0, 0.9)";
       ctx.beginPath();
       ctx.arc(0, 0, 42 + speed * 18, 0, Math.PI * 2);
       ctx.stroke();
@@ -226,14 +234,14 @@ export function Field({ highlight, onPick }: FieldProps) {
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.rotate(t * 1.8);
-      ctx.fillStyle = "#c8f542";
+      ctx.fillStyle = "#e10600";
       for (let i = 0; i < 16; i += 1) {
         ctx.rotate(Math.PI / 8);
         ctx.fillRect(54 + speed * 8, -1, i % 4 === 0 ? 14 : 7, 2);
       }
       ctx.restore();
       ctx.beginPath();
-      ctx.fillStyle = "#c8f542";
+      ctx.fillStyle = "#e10600";
       ctx.arc(mx, my, 2.8, 0, Math.PI * 2);
       ctx.fill();
 
@@ -241,7 +249,7 @@ export function Field({ highlight, onPick }: FieldProps) {
       for (const pulse of pulses.current) {
         pulse.r += 9;
         pulse.a *= 0.9;
-        ctx.strokeStyle = `rgba(200, 245, 66, ${pulse.a})`;
+        ctx.strokeStyle = `rgba(225, 6, 0, ${pulse.a})`;
         ctx.beginPath();
         ctx.arc(pulse.x, pulse.y, pulse.r, 0, Math.PI * 2);
         ctx.stroke();
@@ -254,7 +262,7 @@ export function Field({ highlight, onPick }: FieldProps) {
         bit.vx *= 0.94;
         bit.vy *= 0.94;
         bit.a *= 0.9;
-        ctx.fillStyle = `rgba(200, 245, 66, ${bit.a})`;
+        ctx.fillStyle = `rgba(225, 6, 0, ${bit.a})`;
         ctx.fillRect(bit.x, bit.y, 3, 3);
       }
 
@@ -274,7 +282,7 @@ export function Field({ highlight, onPick }: FieldProps) {
         const skew = Math.max(-22, Math.min(22, -body.vx * 1.8));
         const aberr = Math.min(10, speedN * 1.1);
         el.style.transform = `translate3d(${body.x}px, ${body.y}px, 0) translate(-50%, -50%) skewX(${skew}deg) scale(${stretch * zoom}, ${(1 / stretch) * zoom})`;
-        el.style.textShadow = `${-aberr}px 0 0 rgba(255, 70, 110, 0.55), ${aberr}px 0 0 rgba(80, 160, 255, 0.5), 0 0 22px rgba(5,5,7,0.85)`;
+        el.style.textShadow = `${-aberr}px 0 0 rgba(225, 6, 0, 0.7), ${aberr}px 0 0 rgba(255, 255, 255, 0.28), 0 0 22px rgba(5,5,7,0.85)`;
         el.style.zIndex = dist < 140 ? "3" : "1";
       }
 
@@ -301,6 +309,9 @@ export function Field({ highlight, onPick }: FieldProps) {
         DJ
       </div>
       <canvas ref={canvasRef} className="field__canvas" />
+      <button type="button" className="field__face" onClick={() => onPick("about")} aria-label="Open About">
+        <Portrait />
+      </button>
       {NODES.map((node) => (
         <button
           key={node.id}
@@ -318,7 +329,7 @@ export function Field({ highlight, onPick }: FieldProps) {
           {node.label}
         </button>
       ))}
-      <p className="field__hint">Fling the type · click a fragment · keys 1–4</p>
+      <p className="field__hint">Fling the type · click the portrait · keys 1–4</p>
     </div>
   );
 }

@@ -26,7 +26,7 @@ export async function GET(req: Request) {
           padding: 48,
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 20, letterSpacing: 6, color: "#C8F542" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 20, letterSpacing: 6, color: "#E10600" }}>
           <div style={{ display: "flex" }}>COMPOSE · LOCK {String(score)}</div>
           <div style={{ display: "flex" }}>{mentioned ? "IN FRAME" : "OUT OF FRAME"}</div>
         </div>
