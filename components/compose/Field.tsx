@@ -109,8 +109,8 @@ export function Field({ highlight, onPick }: FieldProps) {
             const b = list[j];
             const rx = a.x - b.x;
             const ry = a.y - b.y;
-            const d2 = Math.max(28, rx * rx + ry * ry);
-            const force = 210 / d2;
+            const d2 = Math.max(48, rx * rx + ry * ry);
+            const force = 320 / d2;
             a.vx += rx * force * 0.018;
             a.vy += ry * force * 0.018;
             b.vx -= rx * force * 0.018;

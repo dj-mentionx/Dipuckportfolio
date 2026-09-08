@@ -189,6 +189,7 @@ a {
 
 .boot__mark {
   position: relative;
+  isolation: isolate;
   width: min(92vw, 920px);
   height: 42vh;
   display: grid;
@@ -212,7 +213,7 @@ a {
   right: 4%;
   height: 18%;
   overflow: hidden;
-  mix-blend-mode: difference;
+  mix-blend-mode: screen;
 }
 
 .boot__slice span {
