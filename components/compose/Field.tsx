@@ -18,6 +18,8 @@ export function Field({ highlight, onPick }: FieldProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ghostRef = useRef<HTMLDivElement>(null);
+  const faceRef = useRef<HTMLButtonElement>(null);
+  const exposure = useRef(0.18);
   const mouse = useRef({ x: 0.5, y: 0.5, vx: 0, vy: 0 });
   const bodies = useRef<Body[]>([]);
   const labels = useRef<Map<string, HTMLButtonElement>>(new Map());
@@ -137,9 +139,9 @@ export function Field({ highlight, onPick }: FieldProps) {
           const cdx = a.x - w / 2;
           const cdy = a.y - h / 2;
           const cd = Math.max(24, Math.hypot(cdx, cdy));
-          if (cd < 168) {
-            a.vx += (cdx / cd) * 0.62;
-            a.vy += (cdy / cd) * 0.62;
+          if (cd < 210) {
+            a.vx += (cdx / cd) * 0.72;
+            a.vy += (cdy / cd) * 0.72;
           }
           a.vx += Math.cos(t * 0.85 + i) * 0.03;
           a.vy += Math.sin(t * 0.7 + i * 0.9) * 0.03;
@@ -272,6 +274,22 @@ export function Field({ highlight, onPick }: FieldProps) {
         ghostRef.current.style.transform = `translate3d(${gx}px, ${gy}px, 0)`;
       }
 
+      const face = faceRef.current;
+      if (face) {
+        const box = face.getBoundingClientRect();
+        const wrapBox = wrap.getBoundingClientRect();
+        const fx = (mx - (box.left - wrapBox.left)) / Math.max(1, box.width);
+        const fy = (my - (box.top - wrapBox.top)) / Math.max(1, box.height);
+        const onFace = fx > -0.05 && fx < 1.05 && fy > -0.05 && fy < 1.05;
+        exposure.current = Math.min(1, Math.max(0.14, exposure.current + (onFace ? 0.016 : -0.0045)));
+        face.style.setProperty("--lx", `${fx * 100}%`);
+        face.style.setProperty("--ly", `${fy * 100}%`);
+        face.style.setProperty("--ex", String(exposure.current));
+        face.style.setProperty("--ox", String((fx - 0.5) * 18));
+        face.style.setProperty("--oy", String((fy - 0.5) * 10));
+      }
+
+      const faceMid = h * 0.48;
       for (const body of list) {
         const el = labels.current.get(body.id);
         if (!el) continue;
@@ -283,7 +301,7 @@ export function Field({ highlight, onPick }: FieldProps) {
         const aberr = Math.min(10, speedN * 1.1);
         el.style.transform = `translate3d(${body.x}px, ${body.y}px, 0) translate(-50%, -50%) skewX(${skew}deg) scale(${stretch * zoom}, ${(1 / stretch) * zoom})`;
         el.style.textShadow = `${-aberr}px 0 0 rgba(225, 6, 0, 0.7), ${aberr}px 0 0 rgba(255, 255, 255, 0.28), 0 0 22px rgba(5,5,7,0.85)`;
-        el.style.zIndex = dist < 140 ? "3" : "1";
+        el.style.zIndex = body.y < faceMid - 8 ? "3" : "6";
       }
 
       raf = requestAnimationFrame(tick);
@@ -309,8 +327,8 @@ export function Field({ highlight, onPick }: FieldProps) {
         DJ
       </div>
       <canvas ref={canvasRef} className="field__canvas" />
-      <button type="button" className="field__face" onClick={() => onPick("about")} aria-label="Open About">
-        <Portrait />
+      <button ref={faceRef} type="button" className="field__face" onClick={() => onPick("about")} aria-label="Develop portrait, open About">
+        <Portrait live />
       </button>
       {NODES.map((node) => (
         <button
@@ -329,7 +347,7 @@ export function Field({ highlight, onPick }: FieldProps) {
           {node.label}
         </button>
       ))}
-      <p className="field__hint">Fling the type · click the portrait · keys 1–4</p>
+      <p className="field__hint">Hold the red light to the face · fling the type · keys 1–4</p>
     </div>
   );
 }

@@ -72,8 +72,18 @@ export function Chapter({ id, onClose, onScan }: ChapterProps) {
             initial={{ clipPath: "inset(100% 0 0 0)", opacity: 0 }}
             animate={{ clipPath: "inset(0% 0 0 0)", opacity: 1 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            onPointerMove={(event) => {
+              const box = event.currentTarget.getBoundingClientRect();
+              const fx = (event.clientX - box.left) / box.width;
+              const fy = (event.clientY - box.top) / box.height;
+              event.currentTarget.style.setProperty("--lx", `${fx * 100}%`);
+              event.currentTarget.style.setProperty("--ly", `${fy * 100}%`);
+              event.currentTarget.style.setProperty("--ex", "1");
+              event.currentTarget.style.setProperty("--ox", String((fx - 0.5) * 14));
+              event.currentTarget.style.setProperty("--oy", String((fy - 0.5) * 8));
+            }}
           >
-            <Portrait />
+            <Portrait live />
           </motion.div>
         ) : null}
         <KineticTitle text={data.title} />

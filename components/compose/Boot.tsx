@@ -135,7 +135,7 @@ export function Boot({ onDone }: BootProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: named ? 1 : 0 }}
       >
-        Conduct the lockup. Fling the type. Click a fragment.
+        Hold the red light to the face. The print develops.
       </motion.p>
       <motion.button type="button" className="boot__cta" onClick={finish} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
         SKIP INTRO

@@ -232,6 +232,7 @@ a {
   display: grid;
   gap: 0;
   perspective: 900px;
+  mix-blend-mode: difference;
 }
 
 .boot__row {
@@ -273,25 +274,68 @@ a {
   border-radius: 50%;
   isolation: isolate;
   background: #050507;
+  aspect-ratio: 1;
 }
 
-.portrait img,
-.portrait span img {
-  display: block;
-  width: 100%;
-  height: 100%;
+.portrait__plate,
+.portrait__ghost {
+  position: absolute;
+  inset: 0;
+  background: url("/portraits/dipuck.jpg") center 12% / cover no-repeat;
+}
+
+.portrait__plate {
+  filter: grayscale(1) contrast(1.45) brightness(0.22);
+}
+
+.portrait__print-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+.portrait__print {
   object-fit: cover;
   object-position: center 12%;
-  filter: contrast(1.1) saturate(0.88);
+  filter: contrast(1.12) saturate(0.82);
+}
+
+.portrait.is-live .portrait__print-wrap {
+  -webkit-mask-image: radial-gradient(
+    circle calc(64px + var(--ex, 0.18) * 210px) at var(--lx, 50%) var(--ly, 38%),
+    #000 38%,
+    transparent 78%
+  );
+  mask-image: radial-gradient(
+    circle calc(64px + var(--ex, 0.18) * 210px) at var(--lx, 50%) var(--ly, 38%),
+    #000 38%,
+    transparent 78%
+  );
+}
+
+.portrait__ghost {
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.38;
+  transform: translate(calc(var(--ox, 0) * 1px), calc(var(--oy, 0) * 1px));
+  filter: grayscale(1) sepia(1) hue-rotate(-42deg) saturate(14) brightness(0.85);
+}
+
+.portrait__scan {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 16%;
+  background: linear-gradient(transparent, rgba(225, 6, 0, 0.55), transparent);
+  animation: print-scan 2.6s linear infinite;
+  mix-blend-mode: screen;
 }
 
 .portrait::after {
   content: "";
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at 30% 20%, transparent 40%, rgba(5, 5, 7, 0.28) 100%),
-    linear-gradient(180deg, transparent 58%, rgba(5, 5, 7, 0.55) 100%);
+  background: linear-gradient(180deg, transparent 58%, rgba(5, 5, 7, 0.5) 100%);
   pointer-events: none;
 }
 
@@ -320,11 +364,16 @@ a {
 }
 
 .field__face {
+  --lx: 50%;
+  --ly: 38%;
+  --ex: 0.18;
+  --ox: 0;
+  --oy: 0;
   position: absolute;
   left: 50%;
   top: 48%;
   z-index: 4;
-  width: min(28vw, 250px);
+  width: min(34vw, 320px);
   transform: translate(-50%, -50%);
   appearance: none;
   border: 0;
@@ -332,7 +381,8 @@ a {
   background: transparent;
   cursor: none;
   border-radius: 50%;
-  box-shadow: 0 0 0 1px #e10600, 0 0 70px rgba(225, 6, 0, 0.42);
+  box-shadow: 0 0 0 1px #e10600, 0 0 80px rgba(225, 6, 0, 0.38);
+  animation: face-pulse 2.8s ease-in-out infinite;
 }
 
 .field__face .portrait {
@@ -341,6 +391,11 @@ a {
 }
 
 .chapter__face {
+  --lx: 50%;
+  --ly: 38%;
+  --ex: 0.72;
+  --ox: 0;
+  --oy: 0;
   width: min(220px, 52vw);
   margin: 0 0 22px;
 }
@@ -899,6 +954,16 @@ a {
   to { transform: translateX(-50%); }
 }
 
+@keyframes print-scan {
+  from { top: -18%; }
+  to { top: 112%; }
+}
+
+@keyframes face-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px #e10600, 0 0 70px rgba(225, 6, 0, 0.28); }
+  50% { box-shadow: 0 0 0 1px #e10600, 0 0 110px rgba(225, 6, 0, 0.55); }
+}
+
 @media (max-width: 860px) {
   .chapter__panel {
     width: 100%;
@@ -940,7 +1005,9 @@ a {
   .compose__grid,
   .ticker__track,
   .chapter__ghost,
-  .field__crawl-track {
+  .field__crawl-track,
+  .portrait__scan,
+  .field__face {
     animation: none;
   }
 }
