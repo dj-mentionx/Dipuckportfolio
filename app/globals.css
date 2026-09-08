@@ -1,5 +1,11 @@
 @import "./tokens.css";
 
+@property --ex {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.08;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -355,6 +361,11 @@ a {
 }
 
 .boot__face {
+  --lx: 50%;
+  --ly: 38%;
+  --ex: 0.08;
+  --ox: 0;
+  --oy: 0;
   position: absolute;
   left: 50%;
   top: 44%;
@@ -362,6 +373,7 @@ a {
   width: min(46vw, 360px);
   transform: translate(-50%, -50%);
   pointer-events: none;
+  animation: boot-expose 2s ease forwards;
 }
 
 .boot__face .portrait {
@@ -394,6 +406,30 @@ a {
 .field__face .portrait {
   width: 100%;
   aspect-ratio: 1;
+}
+
+.field__burns {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.field__burn {
+  position: absolute;
+  font-weight: 800;
+  font-size: clamp(16px, 2.1vw, 34px);
+  letter-spacing: -0.06em;
+  line-height: 1;
+  color: #e10600;
+  mix-blend-mode: screen;
+  opacity: var(--a, 0.7);
+  transform: translate(-50%, -50%) rotate(var(--r, 0deg));
+  white-space: nowrap;
+  text-shadow: 0 0 18px rgba(225, 6, 0, 0.7);
+  pointer-events: none;
 }
 
 .chapter__face {
@@ -970,6 +1006,11 @@ a {
   50% { box-shadow: 0 0 0 1px #e10600, 0 0 110px rgba(225, 6, 0, 0.55); }
 }
 
+@keyframes boot-expose {
+  from { --ex: 0.08; }
+  to { --ex: 1; }
+}
+
 @media (max-width: 860px) {
   .chapter__panel {
     width: 100%;
@@ -1013,7 +1054,8 @@ a {
   .chapter__ghost,
   .field__crawl-track,
   .portrait__scan,
-  .field__face {
+  .field__face,
+  .boot__face {
     animation: none;
   }
 }

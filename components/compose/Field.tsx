@@ -8,6 +8,7 @@ type Body = FieldNode & { x: number; y: number; vx: number; vy: number };
 
 type Pulse = { x: number; y: number; r: number; a: number };
 type Burst = { x: number; y: number; vx: number; vy: number; a: number };
+type Burn = { id: string; label: string; x: number; y: number; a: number; rot: number; el: HTMLSpanElement };
 
 type FieldProps = {
   highlight?: string;
@@ -19,7 +20,10 @@ export function Field({ highlight, onPick }: FieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ghostRef = useRef<HTMLDivElement>(null);
   const faceRef = useRef<HTMLButtonElement>(null);
+  const burnsRef = useRef<HTMLDivElement>(null);
   const exposure = useRef(0.08);
+  const burns = useRef<Burn[]>([]);
+  const lastBurn = useRef<Map<string, number>>(new Map());
   const mouse = useRef({ x: 0.5, y: 0.5, vx: 0, vy: 0 });
   const bodies = useRef<Body[]>([]);
   const labels = useRef<Map<string, HTMLButtonElement>>(new Map());
@@ -281,27 +285,115 @@ export function Field({ highlight, onPick }: FieldProps) {
         const fx = (mx - (box.left - wrapBox.left)) / Math.max(1, box.width);
         const fy = (my - (box.top - wrapBox.top)) / Math.max(1, box.height);
         const onFace = fx > -0.05 && fx < 1.05 && fy > -0.05 && fy < 1.05;
-        exposure.current = Math.min(1, Math.max(0.06, exposure.current + (onFace ? 0.03 : -0.012)));
+        exposure.current = Math.min(1, Math.max(0.06, exposure.current + (onFace ? 0.038 : -0.02)));
         face.style.setProperty("--lx", `${fx * 100}%`);
         face.style.setProperty("--ly", `${fy * 100}%`);
         face.style.setProperty("--ex", String(exposure.current));
         face.style.setProperty("--ox", String((fx - 0.5) * 18));
         face.style.setProperty("--oy", String((fy - 0.5) * 10));
-      }
 
-      const faceMid = h * 0.48;
-      for (const body of list) {
-        const el = labels.current.get(body.id);
-        if (!el) continue;
-        const dist = Math.hypot(body.x - mx, body.y - my);
-        const speedN = Math.hypot(body.vx, body.vy);
-        const stretch = 1 + Math.min(0.55, speedN * 0.08);
-        const zoom = 1 + Math.max(0, 1 - dist / 260) * 0.42;
-        const skew = Math.max(-22, Math.min(22, -body.vx * 1.8));
-        const aberr = Math.min(10, speedN * 1.1);
-        el.style.transform = `translate3d(${body.x}px, ${body.y}px, 0) translate(-50%, -50%) skewX(${skew}deg) scale(${stretch * zoom}, ${(1 / stretch) * zoom})`;
-        el.style.textShadow = `${-aberr}px 0 0 rgba(225, 6, 0, 0.7), ${aberr}px 0 0 rgba(255, 255, 255, 0.28), 0 0 22px rgba(5,5,7,0.85)`;
-        el.style.zIndex = body.y < faceMid - 8 ? "3" : "6";
+        const faceCx = box.left - wrapBox.left + box.width / 2;
+        const faceCy = box.top - wrapBox.top + box.height / 2;
+        const faceR = box.width / 2;
+        const beam = Math.hypot(mx - faceCx, my - faceCy);
+        if (beam > 18 && beam < 560) {
+          const fromC = Math.atan2(my - faceCy, mx - faceCx);
+          const offset = Math.acos(Math.min(0.999, faceR / beam));
+          const t1x = faceCx + Math.cos(fromC + offset) * faceR;
+          const t1y = faceCy + Math.sin(fromC + offset) * faceR;
+          const t2x = faceCx + Math.cos(fromC - offset) * faceR;
+          const t2y = faceCy + Math.sin(fromC - offset) * faceR;
+          ctx.save();
+          ctx.fillStyle = `rgba(225, 6, 0, ${(0.11 + exposure.current * 0.16) * (1 - beam / 560)})`;
+          ctx.beginPath();
+          ctx.moveTo(mx, my);
+          ctx.lineTo(t1x, t1y);
+          ctx.arc(faceCx, faceCy, faceR, fromC + offset, fromC - offset, true);
+          ctx.lineTo(t2x, t2y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(225, 6, 0, ${0.12 + exposure.current * 0.2})`;
+          ctx.arc(faceCx, faceCy, faceR * (0.55 + exposure.current * 0.2), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+          ctx.beginPath();
+          ctx.fillStyle = "#e10600";
+          ctx.arc(mx, my, 2.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        const tray = burnsRef.current;
+        if (tray) {
+          for (const body of list) {
+            const dx = body.x - faceCx;
+            const dy = body.y - faceCy;
+            const onPrint = Math.hypot(dx, dy) < faceR * 0.82;
+            if (!onPrint) continue;
+            body.vx *= 0.82;
+            body.vy *= 0.82;
+            const prev = lastBurn.current.get(body.id) ?? 0;
+            if (time - prev < 980 || burns.current.length >= 10) continue;
+            lastBurn.current.set(body.id, time);
+            const stamp = document.createElement("span");
+            stamp.className = "field__burn";
+            stamp.textContent = body.label;
+            tray.appendChild(stamp);
+            burns.current.push({
+              id: body.id,
+              label: body.label,
+              x: 0.5 + dx / box.width,
+              y: 0.5 + dy / box.height,
+              a: 0.92,
+              rot: (body.vx + body.vy) * 4,
+              el: stamp,
+            });
+          }
+          burns.current = burns.current.filter((burn) => {
+            burn.a *= 0.992;
+            if (burn.a < 0.08) {
+              burn.el.remove();
+              return false;
+            }
+            burn.el.style.left = `${burn.x * 100}%`;
+            burn.el.style.top = `${burn.y * 100}%`;
+            burn.el.style.setProperty("--a", String(burn.a * (0.35 + exposure.current * 0.65)));
+            burn.el.style.setProperty("--r", `${burn.rot}deg`);
+            return true;
+          });
+        }
+
+        for (const body of list) {
+          const el = labels.current.get(body.id);
+          if (!el) continue;
+          const dist = Math.hypot(body.x - mx, body.y - my);
+          const onPrint = Math.hypot(body.x - faceCx, body.y - faceCy) < faceR * 0.9;
+          const speedN = Math.hypot(body.vx, body.vy);
+          const stretch = 1 + Math.min(0.55, speedN * 0.08);
+          const zoom = 1 + Math.max(0, 1 - dist / 260) * 0.42;
+          const skew = Math.max(-22, Math.min(22, -body.vx * 1.8));
+          const aberr = Math.min(10, speedN * 1.1);
+          el.style.transform = `translate3d(${body.x}px, ${body.y}px, 0) translate(-50%, -50%) skewX(${skew}deg) scale(${stretch * zoom}, ${(1 / stretch) * zoom})`;
+          el.style.textShadow = `${-aberr}px 0 0 rgba(225, 6, 0, 0.7), ${aberr}px 0 0 rgba(255, 255, 255, 0.28), 0 0 22px rgba(5,5,7,0.85)`;
+          el.style.opacity = onPrint ? "0.28" : "1";
+          if (onPrint) el.style.zIndex = body.y < faceCy + faceR * 0.12 ? "3" : "6";
+          else el.style.zIndex = body.y < faceCy ? "3" : "5";
+        }
+      } else {
+        const faceMid = h * 0.48;
+        for (const body of list) {
+          const el = labels.current.get(body.id);
+          if (!el) continue;
+          const dist = Math.hypot(body.x - mx, body.y - my);
+          const speedN = Math.hypot(body.vx, body.vy);
+          const stretch = 1 + Math.min(0.55, speedN * 0.08);
+          const zoom = 1 + Math.max(0, 1 - dist / 260) * 0.42;
+          const skew = Math.max(-22, Math.min(22, -body.vx * 1.8));
+          const aberr = Math.min(10, speedN * 1.1);
+          el.style.transform = `translate3d(${body.x}px, ${body.y}px, 0) translate(-50%, -50%) skewX(${skew}deg) scale(${stretch * zoom}, ${(1 / stretch) * zoom})`;
+          el.style.textShadow = `${-aberr}px 0 0 rgba(225, 6, 0, 0.7), ${aberr}px 0 0 rgba(255, 255, 255, 0.28), 0 0 22px rgba(5,5,7,0.85)`;
+          el.style.zIndex = body.y < faceMid - 8 ? "3" : "6";
+        }
       }
 
       raf = requestAnimationFrame(tick);
@@ -313,6 +405,8 @@ export function Field({ highlight, onPick }: FieldProps) {
       window.removeEventListener("resize", resize);
       wrap.removeEventListener("pointermove", onMove);
       wrap.removeEventListener("pointerdown", onDown);
+      burns.current.forEach((burn) => burn.el.remove());
+      burns.current = [];
     };
   }, [highlight]);
 
@@ -329,6 +423,7 @@ export function Field({ highlight, onPick }: FieldProps) {
       <canvas ref={canvasRef} className="field__canvas" />
       <button ref={faceRef} type="button" className="field__face" onClick={() => onPick("about")} aria-label="Develop portrait, open About">
         <Portrait live />
+        <div ref={burnsRef} className="field__burns" aria-hidden />
       </button>
       {NODES.map((node) => (
         <button
@@ -347,7 +442,7 @@ export function Field({ highlight, onPick }: FieldProps) {
           {node.label}
         </button>
       ))}
-      <p className="field__hint">Hold the red light to the face · fling the type · keys 1–4</p>
+      <p className="field__hint">Hold the light on the face · words that cross it burn in · keys 1–4</p>
     </div>
   );
 }

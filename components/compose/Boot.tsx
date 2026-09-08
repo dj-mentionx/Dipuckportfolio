@@ -59,7 +59,7 @@ export function Boot({ onDone }: BootProps) {
         animate={{ scaleX: 1 }}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       />
-      <p className="boot__kicker">LIVE TITLE SEQUENCE · BERLIN</p>
+      <p className="boot__kicker">DARKROOM · ENLARGER ON · BERLIN</p>
 
       {named ? (
         <motion.div
@@ -68,7 +68,7 @@ export function Boot({ onDone }: BootProps) {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          <Portrait />
+          <Portrait live />
         </motion.div>
       ) : null}
 
@@ -135,7 +135,7 @@ export function Boot({ onDone }: BootProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: named ? 1 : 0 }}
       >
-        Hold the red light to the face. The print develops.
+        Hold the red light on the face. Words that cross it burn the print.
       </motion.p>
       <motion.button type="button" className="boot__cta" onClick={finish} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
         SKIP INTRO

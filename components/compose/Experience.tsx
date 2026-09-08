@@ -87,8 +87,8 @@ export function Experience() {
             </button>
           </nav>
           <div className="compose__hud compose__hud--tl">
-            COMPOSE
-            <strong>LIVE</strong>
+            DARKROOM
+            <strong>EXPOSE</strong>
           </div>
           <div className="compose__hud compose__hud--tr">
             UTC
