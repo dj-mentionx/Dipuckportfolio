@@ -10,12 +10,13 @@ export default function Icon() {
         style={{
           width: 32,
           height: 32,
-          background: "#07140f",
-          color: "#F0C27A",
+          background: "#050507",
+          color: "#C8F542",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           fontSize: 14,
+          fontWeight: 800,
         }}
       >
         DJ

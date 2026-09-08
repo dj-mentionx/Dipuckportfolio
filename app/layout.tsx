@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Fraunces, IBM_Plex_Mono } from "next/font/google";
+import { IBM_Plex_Mono, Syne } from "next/font/google";
 import "./globals.css";
 
-const display = Fraunces({
+const sans = Syne({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-sans",
   display: "swap",
+  weight: ["500", "700", "800"],
 });
 
 const mono = IBM_Plex_Mono({
@@ -17,14 +18,14 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://dipuckjones.com"),
-  title: "Dipuck Jones — From the trees to the city",
-  description: "A sideways picture: forest, village, city. Then four rooms on a projector.",
+  title: "Dipuck Jones — COMPOSE",
+  description: "A live kinetic lockup. Conduct the field. 13 years of B2B SaaS growth, MentionX, Berlin.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${mono.variable}`}>
-      <body className="font-display antialiased">{children}</body>
+    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

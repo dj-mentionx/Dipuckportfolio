@@ -17,8 +17,8 @@ export function visibilityBlocks(score: number): string {
 
 export function shareText(name: string, score: number, mentioned: boolean): string {
   return [
-    `RUSHES — ${name}`,
-    `TAKE ${score} · ${mentioned ? "IN SYNC" : "WILD SOUND"}`,
+    `COMPOSE — ${name}`,
+    `LOCK ${score} · ${mentioned ? "IN FRAME" : "OUT OF FRAME"}`,
     "scanned via dipuckjones.com",
   ].join("\n");
 }

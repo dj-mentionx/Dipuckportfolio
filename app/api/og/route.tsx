@@ -20,30 +20,21 @@ export async function GET(req: Request) {
           height: 630,
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "#0B0907",
-          color: "#EFE6D4",
+          justifyContent: "space-between",
+          backgroundColor: "#050507",
+          color: "#F4F4F0",
           padding: 48,
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", height: 28 }}>
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} style={{ display: "flex", width: 28, height: 18, backgroundColor: "#1B1712" }} />
-          ))}
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 20, letterSpacing: 6, color: "#C8F542" }}>
+          <div style={{ display: "flex" }}>COMPOSE · LOCK {String(score)}</div>
+          <div style={{ display: "flex" }}>{mentioned ? "IN FRAME" : "OUT OF FRAME"}</div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "center", padding: "20px 12px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 20, color: "#8A7D6B" }}>
-            <div style={{ display: "flex" }}>RUSHES · TAKE {String(score)}</div>
-            <div style={{ display: "flex", color: "#FF3B2F" }}>{mentioned ? "IN SYNC" : "WILD SOUND"}</div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", fontSize: 84, fontWeight: 800, letterSpacing: -3 }}>{name}</div>
+          <div style={{ display: "flex", marginTop: 18, fontSize: 28, color: "rgba(244,244,240,0.7)" }}>
+            MentionX pull · dipuckjones.com
           </div>
-          <div style={{ display: "flex", fontSize: 72, marginTop: 24 }}>{name}</div>
-          <div style={{ display: "flex", marginTop: 18, fontSize: 28, color: "#F0C27A" }}>
-            {mentioned ? "HIT" : "MISS"} · scanned via dipuckjones.com
-          </div>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", height: 28 }}>
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} style={{ display: "flex", width: 28, height: 18, backgroundColor: "#1B1712" }} />
-          ))}
         </div>
       </div>
     ),
