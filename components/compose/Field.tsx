@@ -143,9 +143,9 @@ export function Field({ highlight, onPick }: FieldProps) {
           const cdx = a.x - w / 2;
           const cdy = a.y - h / 2;
           const cd = Math.max(24, Math.hypot(cdx, cdy));
-          if (cd < 210) {
-            a.vx += (cdx / cd) * 0.72;
-            a.vy += (cdy / cd) * 0.72;
+          if (cd < 88) {
+            a.vx += (cdx / cd) * 0.38;
+            a.vy += (cdy / cd) * 0.38;
           }
           a.vx += Math.cos(t * 0.85 + i) * 0.03;
           a.vy += Math.sin(t * 0.7 + i * 0.9) * 0.03;
@@ -328,12 +328,12 @@ export function Field({ highlight, onPick }: FieldProps) {
           for (const body of list) {
             const dx = body.x - faceCx;
             const dy = body.y - faceCy;
-            const onPrint = Math.hypot(dx, dy) < faceR * 0.82;
+            const onPrint = Math.hypot(dx, dy) < faceR * 0.94;
             if (!onPrint) continue;
-            body.vx *= 0.82;
-            body.vy *= 0.82;
+            body.vx *= 0.88;
+            body.vy *= 0.88;
             const prev = lastBurn.current.get(body.id) ?? 0;
-            if (time - prev < 980 || burns.current.length >= 10) continue;
+            if (time - prev < 640 || burns.current.length >= 12) continue;
             lastBurn.current.set(body.id, time);
             const stamp = document.createElement("span");
             stamp.className = "field__burn";
@@ -350,14 +350,14 @@ export function Field({ highlight, onPick }: FieldProps) {
             });
           }
           burns.current = burns.current.filter((burn) => {
-            burn.a *= 0.992;
-            if (burn.a < 0.08) {
+            burn.a *= 0.997;
+            if (burn.a < 0.12) {
               burn.el.remove();
               return false;
             }
             burn.el.style.left = `${burn.x * 100}%`;
             burn.el.style.top = `${burn.y * 100}%`;
-            burn.el.style.setProperty("--a", String(burn.a * (0.35 + exposure.current * 0.65)));
+            burn.el.style.setProperty("--a", String(burn.a * (0.72 + exposure.current * 0.28)));
             burn.el.style.setProperty("--r", `${burn.rot}deg`);
             return true;
           });

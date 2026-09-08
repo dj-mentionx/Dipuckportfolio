@@ -420,16 +420,17 @@ a {
 .field__burn {
   position: absolute;
   font-weight: 800;
-  font-size: clamp(16px, 2.1vw, 34px);
-  letter-spacing: -0.06em;
+  font-size: clamp(22px, 3vw, 48px);
+  letter-spacing: -0.07em;
   line-height: 1;
   color: #e10600;
-  mix-blend-mode: screen;
-  opacity: var(--a, 0.7);
+  opacity: var(--a, 0.85);
   transform: translate(-50%, -50%) rotate(var(--r, 0deg));
   white-space: nowrap;
-  text-shadow: 0 0 18px rgba(225, 6, 0, 0.7);
+  -webkit-text-stroke: 1px rgba(5, 5, 7, 0.75);
+  text-shadow: 0 0 16px rgba(225, 6, 0, 0.85);
   pointer-events: none;
+  animation: burn-pop 0.32s ease-out;
 }
 
 .chapter__face {
@@ -1009,6 +1010,18 @@ a {
 @keyframes boot-expose {
   from { --ex: 0.08; }
   to { --ex: 1; }
+}
+
+@keyframes burn-pop {
+  from {
+    transform: translate(-50%, -50%) rotate(var(--r, 0deg)) scale(1.45);
+    filter: blur(6px);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(var(--r, 0deg)) scale(1);
+    filter: blur(0);
+  }
 }
 
 @media (max-width: 860px) {
