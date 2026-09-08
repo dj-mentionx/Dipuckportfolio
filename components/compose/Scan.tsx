@@ -4,6 +4,7 @@ import { FormEvent, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { shareText } from "@/lib/format";
 import type { ScanResult } from "@/lib/types";
+import { Scramble } from "./Scramble";
 
 type ScanProps = {
   onClose: () => void;
@@ -55,7 +56,9 @@ export function Scan({ onClose }: ScanProps) {
         <p className="chapter__kicker">MENTIONX · LIVE PULL</p>
         {!result ? (
           <>
-            <h2 className="scan__prompt">Drop a name into the field.</h2>
+            <h2 className="scan__prompt">
+              <Scramble text="Drop a name into the field." delay={80} />
+            </h2>
             <form onSubmit={onSubmit} className="scan__form">
               <input
                 value={name}
@@ -74,7 +77,7 @@ export function Scan({ onClose }: ScanProps) {
             {error ? <p className="scan__error">{error}</p> : null}
           </>
         ) : (
-          <motion.div initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <div className="scan__meter" aria-hidden>
               <svg viewBox="0 0 120 120">
                 <circle cx="60" cy="60" r="52" />
@@ -85,13 +88,28 @@ export function Scan({ onClose }: ScanProps) {
                   pathLength={1}
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: ring / 100 }}
-                  transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
                 />
               </svg>
-              <strong>{result.score}</strong>
+              <strong>
+                <motion.span initial={{ scale: 2.2, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 240, damping: 16 }}>
+                  {result.score}
+                </motion.span>
+              </strong>
             </div>
             <p className="scan__status">{result.mentioned ? "IN FRAME" : "OUT OF FRAME"}</p>
-            <h3 className="scan__giant">{result.name}</h3>
+            <h3 className="scan__giant">
+              {result.name.split("").map((ch, index) => (
+                <motion.span
+                  key={`${ch}-${index}`}
+                  initial={{ y: 140, rotate: index % 2 ? 12 : -12, opacity: 0 }}
+                  animate={{ y: 0, rotate: 0, opacity: 1 }}
+                  transition={{ delay: index * 0.038, type: "spring", stiffness: 320, damping: 18 }}
+                >
+                  {ch === " " ? "\u00A0" : ch}
+                </motion.span>
+              ))}
+            </h3>
             <p className="scan__copy">{result.excerpt}</p>
             <button
               type="button"

@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { CHAPTERS, type ChapterId } from "@/lib/compose";
 import { EXHIBITS } from "@/lib/exhibits";
+import { CountUp } from "./CountUp";
+import { Scramble } from "./Scramble";
 
 type ChapterProps = {
   id: ChapterId;
@@ -16,9 +19,9 @@ function KineticTitle({ text }: { text: string }) {
       {text.split("").map((ch, index) => (
         <span key={`${ch}-${index}`} className="chapter__letter">
           <motion.span
-            initial={{ y: "110%" }}
-            animate={{ y: "0%" }}
-            transition={{ delay: 0.22 + index * 0.028, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ y: "120%", rotateX: 75 }}
+            animate={{ y: "0%", rotateX: 0 }}
+            transition={{ delay: 0.28 + index * 0.032, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
             {ch === " " ? "\u00A0" : ch}
           </motion.span>
@@ -30,74 +33,76 @@ function KineticTitle({ text }: { text: string }) {
 
 export function Chapter({ id, onClose, onScan }: ChapterProps) {
   const data = CHAPTERS[id];
+  const [copied, setCopied] = useState(false);
+  const [open, setOpen] = useState<string | null>(EXHIBITS[0]?.id ?? null);
+
+  async function copyMail() {
+    await navigator.clipboard.writeText("rush2dipuck@gmail.com");
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1600);
+  }
 
   return (
-    <motion.section
-      className="chapter"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.35 }}
-    >
-      {[0, 1, 2].map((index) => (
+    <motion.section className="chapter" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }}>
+      {[0, 1, 2, 3].map((index) => (
         <motion.div
           key={index}
           className="chapter__wipe"
-          style={{ top: `${index * 33.333}%` }}
+          style={{ top: `${index * 25}%`, height: "25%" }}
           initial={{ scaleX: 0 }}
           animate={{ scaleX: [0, 1, 1, 0] }}
-          transition={{ duration: 0.85, delay: index * 0.05, times: [0, 0.32, 0.62, 1], ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.78, delay: index * 0.045, times: [0, 0.3, 0.58, 1], ease: [0.16, 1, 0.3, 1] }}
         />
       ))}
       <motion.div
         className="chapter__panel"
-        initial={{ x: "-10%", clipPath: "inset(0 100% 0 0)" }}
+        initial={{ x: "-12%", clipPath: "inset(0 100% 0 0)" }}
         animate={{ x: "0%", clipPath: "inset(0 0% 0 0)" }}
         exit={{ x: "-8%", opacity: 0 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
       >
         <p className="chapter__ghost" aria-hidden>
-          {data.figure}
+          {id === "about" ? <CountUp to={13} /> : data.figure}
         </p>
         <p className="chapter__kicker">{data.kicker}</p>
         <KineticTitle text={data.title} />
         {data.lines.map((line, index) => (
-          <motion.p
-            key={line}
-            className="chapter__copy"
-            initial={{ y: 22, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.42 + index * 0.1, duration: 0.5 }}
-          >
-            {line}
-          </motion.p>
+          <p key={line} className="chapter__copy">
+            <Scramble text={line} delay={420 + index * 160} />
+          </p>
         ))}
 
         {id === "work" ? (
-          <div className="chapter__grid">
+          <div className="reel">
             {EXHIBITS.map((exhibit, index) => (
-              <motion.article
+              <motion.button
                 key={exhibit.id}
-                className="chapter__card"
-                initial={{ y: 28, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.55 + index * 0.07, duration: 0.45 }}
+                type="button"
+                className={`reel__row ${open === exhibit.id ? "is-open" : ""}`}
+                initial={{ x: index % 2 === 0 ? -64 : 64, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.55 + index * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                onClick={() => setOpen(exhibit.id)}
               >
-                <h3>
-                  {exhibit.org}
-                </h3>
-                <p>{exhibit.note}</p>
-                <span className="chapter__meta">
-                  {exhibit.role} · {exhibit.figure} · {exhibit.dates}
+                <span className="reel__index">0{index + 1}</span>
+                <span className="reel__org">{exhibit.org}</span>
+                <span className="reel__fig">{exhibit.figure}</span>
+                <span className="reel__note">
+                  {exhibit.role} · {exhibit.dates}
+                  <br />
+                  {exhibit.note}
                 </span>
-              </motion.article>
+              </motion.button>
             ))}
           </div>
         ) : null}
 
         {id === "contact" ? (
           <motion.div className="chapter__links" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}>
-            <a href="mailto:rush2dipuck@gmail.com">rush2dipuck@gmail.com</a>
+            <button type="button" className="chapter__mail" onClick={copyMail}>
+              rush2dipuck@gmail.com
+              <span>{copied ? "copied" : "copy"}</span>
+            </button>
             <a href="https://www.linkedin.com/in/dipuckjones/" target="_blank" rel="noreferrer">
               linkedin.com/in/dipuckjones
             </a>
@@ -105,14 +110,7 @@ export function Chapter({ id, onClose, onScan }: ChapterProps) {
         ) : null}
 
         {id === "bomb" && onScan ? (
-          <motion.button
-            type="button"
-            className="chapter__cta"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.75 }}
-            onClick={onScan}
-          >
+          <motion.button type="button" className="chapter__cta" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} onClick={onScan}>
             Drop a name
           </motion.button>
         ) : null}

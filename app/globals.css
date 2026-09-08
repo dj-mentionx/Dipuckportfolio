@@ -151,6 +151,16 @@ a {
   background: #c8f542;
 }
 
+.compose__flash {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 26;
+  background: #c8f542;
+  mix-blend-mode: screen;
+  transform-origin: center;
+}
+
 .boot {
   position: absolute;
   inset: 0;
@@ -197,35 +207,54 @@ a {
   overflow: hidden;
 }
 
-.boot__word {
+.boot__count {
   margin: 0;
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: clamp(140px, 32vw, 420px);
   font-weight: 800;
-  font-size: clamp(64px, 18vw, 220px);
-  letter-spacing: -0.07em;
+  letter-spacing: -0.1em;
+  line-height: 0.8;
+  color: #c8f542;
+  text-shadow: -8px 0 0 rgba(255, 70, 110, 0.55), 8px 0 0 rgba(80, 160, 255, 0.45);
+}
+
+.boot__lockup {
+  margin: 0;
+  display: grid;
+  gap: 0;
+  perspective: 900px;
+}
+
+.boot__row {
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  font-size: clamp(64px, 16vw, 188px);
+  font-weight: 800;
+  letter-spacing: -0.08em;
   line-height: 0.82;
   color: #f4f4f0;
 }
 
-.boot__slice {
-  position: absolute;
-  left: 4%;
-  right: 4%;
-  height: 18%;
-  overflow: hidden;
-  mix-blend-mode: screen;
+.boot__row span {
+  display: inline-block;
+  transform-origin: bottom;
 }
 
-.boot__slice span {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: clamp(40px, 11vw, 140px);
-  font-weight: 800;
-  letter-spacing: -0.08em;
+.boot__row--lime {
   color: #c8f542;
-  white-space: nowrap;
+}
+
+.boot__flood {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 80px;
+  height: 80px;
+  margin: -40px 0 0 -40px;
+  border-radius: 50%;
+  background: #c8f542;
+  pointer-events: none;
+  z-index: 5;
 }
 
 .boot__cta {
@@ -272,6 +301,42 @@ a {
   inset: 0;
   width: 100%;
   height: 100%;
+}
+
+.field__crawl {
+  pointer-events: none;
+  position: absolute;
+  top: 38%;
+  left: -10%;
+  right: -10%;
+  overflow: hidden;
+  opacity: 0.07;
+  z-index: 0;
+}
+
+.field__crawl-track {
+  font-size: clamp(72px, 14vw, 180px);
+  font-weight: 800;
+  letter-spacing: -0.08em;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px #c8f542;
+  animation: crawl 28s linear infinite;
+}
+
+.field__ghost {
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  margin: -0.4em 0 0 -0.55em;
+  font-size: clamp(160px, 28vw, 380px);
+  font-weight: 800;
+  letter-spacing: -0.1em;
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(200, 245, 66, 0.14);
+  z-index: 0;
 }
 
 .field__node {
@@ -338,7 +403,7 @@ a {
 .chapter__panel {
   position: absolute;
   inset: 0 auto 48px 0;
-  width: min(760px, 100%);
+  width: min(860px, 100%);
   background: linear-gradient(90deg, #050507 72%, rgba(5, 5, 7, 0.55) 100%);
   color: #f4f4f0;
   padding: clamp(88px, 12vh, 140px) clamp(24px, 5vw, 64px) 72px;
@@ -382,6 +447,91 @@ a {
   font-weight: 800;
   letter-spacing: -0.07em;
   line-height: 0.9;
+  perspective: 700px;
+}
+
+.reel {
+  display: grid;
+  margin-top: 28px;
+}
+
+.reel__row {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr auto;
+  gap: 8px 14px;
+  width: 100%;
+  text-align: left;
+  appearance: none;
+  border: 0;
+  border-top: 1px solid rgba(244, 244, 240, 0.14);
+  background: transparent;
+  color: inherit;
+  padding: 14px 0;
+  cursor: pointer;
+}
+
+.reel__row:hover,
+.reel__row.is-open {
+  color: #c8f542;
+}
+
+.reel__index {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  padding-top: 12px;
+}
+
+.reel__org {
+  font-size: clamp(28px, 4.4vw, 56px);
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  line-height: 0.92;
+}
+
+.reel__fig {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding-top: 14px;
+  color: #c8f542;
+}
+
+.reel__note {
+  grid-column: 2 / -1;
+  max-height: 0;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(244, 244, 240, 0.62);
+  transition: max-height 0.35s ease;
+}
+
+.reel__row.is-open .reel__note,
+.reel__row:hover .reel__note {
+  max-height: 9em;
+}
+
+.chapter__mail {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.chapter__mail span {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #c8f542;
 }
 
 .chapter__letter {
@@ -572,12 +722,18 @@ a {
 }
 
 .scan__giant {
+  display: flex;
+  flex-wrap: wrap;
   margin: 8px 0 0;
   font-size: clamp(48px, 12vw, 140px);
   font-weight: 800;
   letter-spacing: -0.08em;
   line-height: 0.85;
   text-transform: uppercase;
+}
+
+.scan__giant span {
+  display: inline-block;
 }
 
 .scan__copy {
@@ -644,6 +800,11 @@ a {
   50% { transform: translate3d(-18px, 12px, 0); }
 }
 
+@keyframes crawl {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
 @media (max-width: 860px) {
   .chapter__panel {
     width: 100%;
@@ -678,7 +839,8 @@ a {
   .compose__grain,
   .compose__grid,
   .ticker__track,
-  .chapter__ghost {
+  .chapter__ghost,
+  .field__crawl-track {
     animation: none;
   }
 }

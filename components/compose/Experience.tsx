@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Boot } from "./Boot";
 import { Chapter } from "./Chapter";
 import { Field } from "./Field";
@@ -30,18 +30,28 @@ function useClock() {
 
 export function Experience() {
   const [mode, setMode] = useState<Mode>("boot");
+  const [flash, setFlash] = useState(0);
+  const modeRef = useRef(mode);
+  modeRef.current = mode;
   const clock = useClock();
   const chapter = isChapter(mode) ? mode : null;
   const highlight = chapter ?? (mode === "scan" ? "bomb" : undefined);
 
+  function go(next: Mode) {
+    if (next !== modeRef.current && modeRef.current !== "boot") setFlash((n) => n + 1);
+    setMode(next);
+  }
+  const goRef = useRef(go);
+  goRef.current = go;
+
   useEffect(() => {
     if (mode === "boot") return;
     function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") setMode("field");
-      if (event.key === "1") setMode("about");
-      if (event.key === "2") setMode("work");
-      if (event.key === "3") setMode("bomb");
-      if (event.key === "4") setMode("contact");
+      if (event.key === "Escape") goRef.current("field");
+      if (event.key === "1") goRef.current("about");
+      if (event.key === "2") goRef.current("work");
+      if (event.key === "3") goRef.current("bomb");
+      if (event.key === "4") goRef.current("contact");
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -49,7 +59,7 @@ export function Experience() {
 
   function onPick(id: string) {
     if (id === "about" || id === "work" || id === "bomb" || id === "contact") {
-      setMode(id);
+      go(id);
     }
   }
 
@@ -63,16 +73,16 @@ export function Experience() {
         <>
           <Field highlight={highlight} onPick={onPick} />
           <nav className="compose__nav" aria-label="Chapters">
-            <button type="button" className={mode === "about" ? "is-on" : ""} onClick={() => setMode("about")}>
+            <button type="button" className={mode === "about" ? "is-on" : ""} onClick={() => go("about")}>
               About
             </button>
-            <button type="button" className={mode === "work" ? "is-on" : ""} onClick={() => setMode("work")}>
+            <button type="button" className={mode === "work" ? "is-on" : ""} onClick={() => go("work")}>
               Work
             </button>
-            <button type="button" className={mode === "bomb" || mode === "scan" ? "is-on" : ""} onClick={() => setMode("bomb")}>
+            <button type="button" className={mode === "bomb" || mode === "scan" ? "is-on" : ""} onClick={() => go("bomb")}>
               MentionX
             </button>
-            <button type="button" className={mode === "contact" ? "is-on" : ""} onClick={() => setMode("contact")}>
+            <button type="button" className={mode === "contact" ? "is-on" : ""} onClick={() => go("contact")}>
               Contact
             </button>
           </nav>
@@ -96,17 +106,25 @@ export function Experience() {
         </>
       ) : null}
 
-      <AnimatePresence>{mode === "boot" ? <Boot onDone={() => setMode("field")} /> : null}</AnimatePresence>
       <AnimatePresence>
-        {chapter ? (
-          <Chapter
-            id={chapter}
-            onClose={() => setMode("field")}
-            onScan={chapter === "bomb" ? () => setMode("scan") : undefined}
+        {flash > 0 ? (
+          <motion.div
+            key={flash}
+            className="compose__flash"
+            initial={{ scaleY: 0, opacity: 1 }}
+            animate={{ scaleY: [0, 1, 0], opacity: [1, 1, 0] }}
+            transition={{ duration: 0.38, times: [0, 0.35, 1], ease: [0.16, 1, 0.3, 1] }}
           />
         ) : null}
       </AnimatePresence>
-      <AnimatePresence>{mode === "scan" ? <Scan onClose={() => setMode("field")} /> : null}</AnimatePresence>
+
+      <AnimatePresence>{mode === "boot" ? <Boot onDone={() => setMode("field")} /> : null}</AnimatePresence>
+      <AnimatePresence>
+        {chapter ? (
+          <Chapter id={chapter} onClose={() => go("field")} onScan={chapter === "bomb" ? () => go("scan") : undefined} />
+        ) : null}
+      </AnimatePresence>
+      <AnimatePresence>{mode === "scan" ? <Scan onClose={() => go("field")} /> : null}</AnimatePresence>
     </div>
   );
 }

@@ -1,79 +1,127 @@
 "use client";
 
-import { useRef } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 type BootProps = {
   onDone: () => void;
 };
 
-const SLICES = ["DIPUCK JONES", "DIPUCK JONES", "DIPUCK JONES"];
+const DIPUCK = "DIPUCK".split("");
+const JONES = "JONES".split("");
 
 export function Boot({ onDone }: BootProps) {
   const locked = useRef(false);
+  const [count, setCount] = useState(3);
+  const [named, setNamed] = useState(false);
 
   function finish() {
     if (locked.current) return;
     locked.current = true;
     onDone();
   }
+  const finishRef = useRef(finish);
+  finishRef.current = finish;
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setNamed(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (named) return;
+    if (count <= 0) {
+      setNamed(true);
+      return;
+    }
+    const id = window.setTimeout(() => setCount((n) => n - 1), 400);
+    return () => window.clearTimeout(id);
+  }, [count, named]);
+
+  useEffect(() => {
+    if (!named) return;
+    const id = window.setTimeout(() => finishRef.current(), 2400);
+    return () => window.clearTimeout(id);
+  }, [named]);
 
   return (
-    <motion.div className="boot" initial={{ opacity: 1 }} exit={{ opacity: 0, filter: "blur(12px)" }} transition={{ duration: 0.55 }}>
+    <motion.div
+      className="boot"
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0, filter: "blur(18px) saturate(1.8)" }}
+      transition={{ duration: 0.5 }}
+    >
       <motion.div
         className="boot__bar"
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
-        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       />
       <p className="boot__kicker">LIVE TITLE SEQUENCE · BERLIN</p>
-      <div className="boot__mark">
-        <motion.h1
-          className="boot__word"
-          aria-label="Dipuck Jones"
-          initial={{ opacity: 0, scale: 1.08 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        >
-          DIPUCK
-        </motion.h1>
-        {SLICES.map((text, index) => (
-          <motion.div
-            key={text + index}
-            className="boot__slice"
-            style={{ top: `${18 + index * 22}%` }}
-            initial={{ x: index % 2 === 0 ? "-46%" : "46%", opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.28 + index * 0.08, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+
+      <AnimatePresence mode="wait">
+        {!named ? (
+          <motion.p
+            key={count}
+            className="boot__count"
+            initial={{ scale: 2.4, opacity: 0, skewX: -18, y: 40 }}
+            animate={{ scale: 1, opacity: 1, skewX: 0, y: 0 }}
+            exit={{ scale: 0.35, opacity: 0, skewX: 22, y: -80 }}
+            transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
           >
-            <span>{text}</span>
+            0{count}
+          </motion.p>
+        ) : (
+          <motion.div key="name" className="boot__mark">
+            <h1 className="boot__lockup" aria-label="Dipuck Jones">
+              <span className="boot__row">
+                {DIPUCK.map((ch, i) => (
+                  <motion.span
+                    key={`d-${ch}-${i}`}
+                    initial={{ y: "120%", rotateX: 80, opacity: 0 }}
+                    animate={{ y: "0%", rotateX: 0, opacity: 1 }}
+                    transition={{ delay: i * 0.05, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    {ch}
+                  </motion.span>
+                ))}
+              </span>
+              <span className="boot__row boot__row--lime">
+                {JONES.map((ch, i) => (
+                  <motion.span
+                    key={`j-${ch}-${i}`}
+                    initial={{ y: "-120%", rotateX: -80, opacity: 0 }}
+                    animate={{ y: "0%", rotateX: 0, opacity: 1 }}
+                    transition={{ delay: 0.28 + i * 0.05, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    {ch}
+                  </motion.span>
+                ))}
+              </span>
+            </h1>
           </motion.div>
-        ))}
-      </div>
+        )}
+      </AnimatePresence>
+      {named ? (
+        <motion.div
+          className="boot__flood"
+          initial={{ scale: 0, opacity: 1 }}
+          animate={{ scale: 28, opacity: [1, 1, 0] }}
+          transition={{ delay: 1.45, duration: 0.8, times: [0, 0.55, 1], ease: [0.7, 0, 0.2, 1] }}
+        />
+      ) : null}
+
       <motion.p
         className="boot__sub"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.05 }}
-      >
-        Conduct the lockup. The type follows the cursor.
-      </motion.p>
-      <motion.button
-        type="button"
-        className="boot__cta"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.35 }}
-        onClick={finish}
+        animate={{ opacity: named ? 1 : 0 }}
       >
-        COMPOSE
+        Conduct the lockup. Fling the type. Click a fragment.
+      </motion.p>
+      <motion.button type="button" className="boot__cta" onClick={finish} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
+        SKIP INTRO
       </motion.button>
-      <motion.div
-        className="boot__done"
-        animate={{ opacity: [0, 1] }}
-        transition={{ delay: 2.45, duration: 0.08 }}
-        onAnimationComplete={finish}
-      />
     </motion.div>
   );
 }
