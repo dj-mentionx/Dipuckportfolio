@@ -19,7 +19,7 @@ export function Field({ highlight, onPick }: FieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ghostRef = useRef<HTMLDivElement>(null);
   const faceRef = useRef<HTMLButtonElement>(null);
-  const exposure = useRef(0.18);
+  const exposure = useRef(0.08);
   const mouse = useRef({ x: 0.5, y: 0.5, vx: 0, vy: 0 });
   const bodies = useRef<Body[]>([]);
   const labels = useRef<Map<string, HTMLButtonElement>>(new Map());
@@ -281,7 +281,7 @@ export function Field({ highlight, onPick }: FieldProps) {
         const fx = (mx - (box.left - wrapBox.left)) / Math.max(1, box.width);
         const fy = (my - (box.top - wrapBox.top)) / Math.max(1, box.height);
         const onFace = fx > -0.05 && fx < 1.05 && fy > -0.05 && fy < 1.05;
-        exposure.current = Math.min(1, Math.max(0.14, exposure.current + (onFace ? 0.016 : -0.0045)));
+        exposure.current = Math.min(1, Math.max(0.06, exposure.current + (onFace ? 0.03 : -0.012)));
         face.style.setProperty("--lx", `${fx * 100}%`);
         face.style.setProperty("--ly", `${fy * 100}%`);
         face.style.setProperty("--ex", String(exposure.current));

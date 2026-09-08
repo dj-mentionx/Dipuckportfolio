@@ -285,7 +285,7 @@ a {
 }
 
 .portrait__plate {
-  filter: grayscale(1) contrast(1.45) brightness(0.22);
+  filter: grayscale(1) contrast(1.55) brightness(0.08);
 }
 
 .portrait__print-wrap {
@@ -301,23 +301,29 @@ a {
 
 .portrait.is-live .portrait__print-wrap {
   -webkit-mask-image: radial-gradient(
-    circle calc(64px + var(--ex, 0.18) * 210px) at var(--lx, 50%) var(--ly, 38%),
-    #000 38%,
-    transparent 78%
+    circle calc(28px + var(--ex, 0.08) * 300px) at var(--lx, 50%) var(--ly, 38%),
+    #000 32%,
+    transparent 74%
   );
   mask-image: radial-gradient(
-    circle calc(64px + var(--ex, 0.18) * 210px) at var(--lx, 50%) var(--ly, 38%),
-    #000 38%,
-    transparent 78%
+    circle calc(28px + var(--ex, 0.08) * 300px) at var(--lx, 50%) var(--ly, 38%),
+    #000 32%,
+    transparent 74%
   );
+}
+
+.portrait.is-live::after {
+  background: rgba(5, 5, 7, calc(0.78 - var(--ex, 0.08) * 0.72));
 }
 
 .portrait__ghost {
   pointer-events: none;
+  background-color: #e10600;
+  background-blend-mode: multiply;
   mix-blend-mode: screen;
-  opacity: 0.38;
+  opacity: calc(0.12 + var(--ex, 0.08) * 0.4);
   transform: translate(calc(var(--ox, 0) * 1px), calc(var(--oy, 0) * 1px));
-  filter: grayscale(1) sepia(1) hue-rotate(-42deg) saturate(14) brightness(0.85);
+  filter: grayscale(1) contrast(1.35) brightness(0.55);
 }
 
 .portrait__scan {
@@ -366,7 +372,7 @@ a {
 .field__face {
   --lx: 50%;
   --ly: 38%;
-  --ex: 0.18;
+  --ex: 0.08;
   --ox: 0;
   --oy: 0;
   position: absolute;
