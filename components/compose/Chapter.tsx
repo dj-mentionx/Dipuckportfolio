@@ -87,6 +87,22 @@ export function Chapter({ id, onClose, onScan }: ChapterProps) {
           </motion.div>
         ) : null}
         <KineticTitle text={data.title} />
+        {id === "bomb" && onScan ? (
+          <motion.button
+            type="button"
+            className="chapter__cta"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              onScan();
+            }}
+          >
+            Drop a name
+          </motion.button>
+        ) : null}
         {data.lines.map((line, index) => (
           <p key={line} className="chapter__copy">
             <Scramble text={line} delay={420 + index * 160} />
@@ -128,22 +144,6 @@ export function Chapter({ id, onClose, onScan }: ChapterProps) {
               linkedin.com/in/dipuckjones
             </a>
           </motion.div>
-        ) : null}
-
-        {id === "bomb" && onScan ? (
-          <motion.button
-            type="button"
-            className="chapter__cta"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            onClick={(event) => {
-              event.stopPropagation();
-              onScan();
-            }}
-          >
-            Drop a name
-          </motion.button>
         ) : null}
 
         <button type="button" className="chapter__back" onClick={onClose}>
