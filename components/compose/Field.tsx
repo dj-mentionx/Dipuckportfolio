@@ -49,12 +49,13 @@ export function Field({ highlight, onPick }: FieldProps) {
       const a = (i / NODES.length) * Math.PI * 2;
       const radius = 0.18 + (i % 5) * 0.045;
       const slice = i % 5 === 0;
+      const chin = i === 4;
       return {
         ...node,
-        x: slice ? w / 2 + (i % 2 ? -220 : 220) : w / 2 + Math.cos(a) * w * radius,
-        y: slice ? h * 0.48 + ((i / 5) % 2 ? 36 : -28) : h / 2 + Math.sin(a) * h * radius,
-        vx: slice ? (i % 2 ? 3.4 : -3.4) : Math.cos(a + 1.2) * 1.2,
-        vy: slice ? 0.4 : Math.sin(a + 1.2) * 1.2,
+        x: chin ? w / 2 - 36 : slice ? w / 2 + (i % 2 ? -160 : 160) : w / 2 + Math.cos(a) * w * radius,
+        y: chin ? h * 0.48 + 72 : slice ? h * 0.48 + ((i / 5) % 2 ? 40 : -30) : h / 2 + Math.sin(a) * h * radius,
+        vx: chin ? 2.6 : slice ? (i % 2 ? 3.2 : -3.2) : Math.cos(a + 1.2) * 1.2,
+        vy: chin ? -0.15 : slice ? 0.35 : Math.sin(a + 1.2) * 1.2,
       };
     });
   }, []);
@@ -147,12 +148,9 @@ export function Field({ highlight, onPick }: FieldProps) {
           const cdy = a.y - h * 0.48;
           const cd = Math.max(24, Math.hypot(cdx, cdy));
           const printR = Math.min(w * 0.17, 160);
-          if (cd < printR * 0.42) {
-            a.vx += (cdx / cd) * 0.34;
-            a.vy += (cdy / cd) * 0.34;
-          } else if (cd < printR * 1.28) {
-            a.vx += (-cdy / cd) * 0.22;
-            a.vy += (cdx / cd) * 0.22;
+          if (cd < printR * 0.34) {
+            a.vx += (cdx / cd) * 0.22;
+            a.vy += (cdy / cd) * 0.22;
           }
           a.vx += Math.cos(t * 0.85 + i) * 0.03;
           a.vy += Math.sin(t * 0.7 + i * 0.9) * 0.03;
