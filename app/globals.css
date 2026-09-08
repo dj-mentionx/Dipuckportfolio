@@ -207,6 +207,14 @@ a {
   overflow: hidden;
 }
 
+.boot__count-wrap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
 .boot__count {
   margin: 0;
   font-size: clamp(140px, 32vw, 420px);

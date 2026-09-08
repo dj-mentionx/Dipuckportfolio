@@ -35,7 +35,7 @@ export function Boot({ onDone }: BootProps) {
       setNamed(true);
       return;
     }
-    const id = window.setTimeout(() => setCount((n) => n - 1), 400);
+    const id = window.setTimeout(() => setCount((n) => n - 1), 560);
     return () => window.clearTimeout(id);
   }, [count, named]);
 
@@ -60,10 +60,15 @@ export function Boot({ onDone }: BootProps) {
       />
       <p className="boot__kicker">LIVE TITLE SEQUENCE · BERLIN</p>
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {!named ? (
-          <motion.p
+          <motion.div
             key={count}
+            className="boot__count-wrap"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+          <motion.p
             className="boot__count"
             initial={{ scale: 2.4, opacity: 0, skewX: -18, y: 40 }}
             animate={{ scale: 1, opacity: 1, skewX: 0, y: 0 }}
@@ -72,6 +77,7 @@ export function Boot({ onDone }: BootProps) {
           >
             0{count}
           </motion.p>
+          </motion.div>
         ) : (
           <motion.div key="name" className="boot__mark">
             <h1 className="boot__lockup" aria-label="Dipuck Jones">
