@@ -131,7 +131,17 @@ export function Chapter({ id, onClose, onScan }: ChapterProps) {
         ) : null}
 
         {id === "bomb" && onScan ? (
-          <motion.button type="button" className="chapter__cta" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} onClick={onScan}>
+          <motion.button
+            type="button"
+            className="chapter__cta"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            onClick={(event) => {
+              event.stopPropagation();
+              onScan();
+            }}
+          >
             Drop a name
           </motion.button>
         ) : null}
