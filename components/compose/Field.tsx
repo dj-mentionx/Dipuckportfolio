@@ -22,9 +22,10 @@ export function Field({ highlight, onPick }: FieldProps) {
   const faceRef = useRef<HTMLButtonElement>(null);
   const burnsRef = useRef<HTMLDivElement>(null);
   const exposure = useRef(0.05);
+  const armed = useRef(false);
   const burns = useRef<Burn[]>([]);
   const lastBurn = useRef<Map<string, number>>(new Map());
-  const mouse = useRef({ x: 0.5, y: 0.5, vx: 0, vy: 0 });
+  const mouse = useRef({ x: 0.12, y: 0.16, vx: 0, vy: 0 });
   const bodies = useRef<Body[]>([]);
   const labels = useRef<Map<string, HTMLButtonElement>>(new Map());
   const pulses = useRef<Pulse[]>([]);
@@ -46,13 +47,14 @@ export function Field({ highlight, onPick }: FieldProps) {
     const h = wrap.clientHeight;
     bodies.current = NODES.map((node, i) => {
       const a = (i / NODES.length) * Math.PI * 2;
-      const radius = 0.16 + (i % 5) * 0.04;
+      const radius = 0.18 + (i % 5) * 0.045;
+      const slice = i % 5 === 0;
       return {
         ...node,
-        x: w / 2 + Math.cos(a) * w * radius,
-        y: h / 2 + Math.sin(a) * h * radius,
-        vx: Math.cos(a + 1.2) * 1.2,
-        vy: Math.sin(a + 1.2) * 1.2,
+        x: slice ? w / 2 + (i % 2 ? -220 : 220) : w / 2 + Math.cos(a) * w * radius,
+        y: slice ? h * 0.48 + ((i / 5) % 2 ? 36 : -28) : h / 2 + Math.sin(a) * h * radius,
+        vx: slice ? (i % 2 ? 3.4 : -3.4) : Math.cos(a + 1.2) * 1.2,
+        vy: slice ? 0.4 : Math.sin(a + 1.2) * 1.2,
       };
     });
   }, []);
@@ -81,6 +83,7 @@ export function Field({ highlight, onPick }: FieldProps) {
       const box = wrap.getBoundingClientRect();
       const nx = (event.clientX - box.left) / box.width;
       const ny = (event.clientY - box.top) / box.height;
+      armed.current = true;
       mouse.current.vx = nx - mouse.current.x;
       mouse.current.vy = ny - mouse.current.y;
       mouse.current.x = nx;
@@ -288,7 +291,7 @@ export function Field({ highlight, onPick }: FieldProps) {
         const wrapBox = wrap.getBoundingClientRect();
         const fx = (mx - (box.left - wrapBox.left)) / Math.max(1, box.width);
         const fy = (my - (box.top - wrapBox.top)) / Math.max(1, box.height);
-        const onFace = Math.hypot(fx - 0.5, fy - 0.5) < 0.56;
+        const onFace = armed.current && Math.hypot(fx - 0.5, fy - 0.5) < 0.56;
         exposure.current = Math.min(1, Math.max(0.05, exposure.current + (onFace ? 0.07 : -0.045)));
         face.style.setProperty("--lx", `${fx * 100}%`);
         face.style.setProperty("--ly", `${fy * 100}%`);
@@ -300,7 +303,7 @@ export function Field({ highlight, onPick }: FieldProps) {
         const faceCy = box.top - wrapBox.top + box.height / 2;
         const faceR = box.width / 2;
         const beam = Math.hypot(mx - faceCx, my - faceCy);
-        if (beam > 18 && beam < 560) {
+        if (beam > 2 && beam < 620) {
           const fromC = Math.atan2(my - faceCy, mx - faceCx);
           const offset = Math.acos(Math.min(0.999, faceR / beam));
           const t1x = faceCx + Math.cos(fromC + offset) * faceR;
