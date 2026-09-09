@@ -285,6 +285,22 @@ export const MENTIONX_STORY = {
   },
 } as const;
 
+export type OrbitSeat = ExperienceSeat & {
+  yaw: number;
+  pitch: number;
+};
+
+export const EXPERIENCE_ORBIT: OrbitSeat[] = EXPERIENCE_SEATS.map((seat, index) => {
+  if (index === 0) return { ...seat, yaw: 0, pitch: 8 };
+  if (index < 6) return { ...seat, yaw: (index - 1) * 72, pitch: 30 };
+  return { ...seat, yaw: (index - 6) * 72 + 36, pitch: -28 };
+});
+
+export const EXPERIENCE_RINGS = {
+  meridians: [0, 36, 72, 108, 144],
+  parallels: [-32, 0, 32],
+};
+
 export function seatById(id: string) {
   return EXPERIENCE_SEATS.find((seat) => seat.id === id);
 }
