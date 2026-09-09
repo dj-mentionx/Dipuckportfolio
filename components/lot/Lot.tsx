@@ -241,6 +241,17 @@ export function Lot({ onEnter, onClassic, onScrap, onReset, shift, quiet = false
         }
       }
       paintWalker();
+      if (!drag.current.on && (mx || my || dest.current)) {
+        const th = (cam.current.yaw * Math.PI) / 180;
+        const wx = pos.current.x * CELL;
+        const wy = pos.current.y * CELL;
+        const rx = wx * Math.cos(th) - wy * Math.sin(th);
+        const ry = wx * Math.sin(th) + wy * Math.cos(th);
+        const sy = ry * Math.cos((58 * Math.PI) / 180);
+        cam.current.x += (-rx * cam.current.zoom - cam.current.x) * 0.08;
+        cam.current.y += (-sy * cam.current.zoom + 36 - cam.current.y) * 0.08;
+        paint();
+      }
 
       const nextNear = nearestPlot(pos.current.x, pos.current.y);
       setNear((prev) => (prev?.id === nextNear?.id ? prev : nextNear));
@@ -325,7 +336,8 @@ export function Lot({ onEnter, onClassic, onScrap, onReset, shift, quiet = false
                 }}
                 aria-label={`Pick up ${scrap.label}`}
               >
-                {scrap.label}
+                <span className="lot__scrap-dot" />
+                <span className="lot__scrap-label">{scrap.label}</span>
               </button>
             ),
           )}
@@ -405,7 +417,7 @@ export function Lot({ onEnter, onClassic, onScrap, onReset, shift, quiet = false
             </li>
           ))}
         </ul>
-        <p className="lot__sheet-kicker">CONTACT {shift.visited.length}/{PLAYABLE.length}</p>
+        <p className="lot__sheet-kicker">FRAMES {shift.visited.length}/{PLAYABLE.length}</p>
         <div className="lot__frames">
           {PLAYABLE.map((plot) => (
             <button
