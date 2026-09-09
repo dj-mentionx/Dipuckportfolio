@@ -16,7 +16,7 @@ export type LotPlot = {
 };
 
 /** How far the walker can roam from the plaza. */
-export const LOT_LIMIT = 7.4;
+export const LOT_LIMIT = 9.2;
 
 /**
  * Companies sit on one wide ring — equal spacing, lots of air between
@@ -24,7 +24,7 @@ export const LOT_LIMIT = 7.4;
  */
 export const LOT_PLOTS: LotPlot[] = EXPERIENCE_SEATS.map((seat, index) => {
   const angle = (index / EXPERIENCE_SEATS.length) * Math.PI * 2 - Math.PI / 2;
-  const radius = 5.85;
+  const radius = 7.85;
   return {
     id: seat.id,
     label: seat.short,

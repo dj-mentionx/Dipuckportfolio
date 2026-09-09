@@ -57,7 +57,7 @@ export function Lot({ onEnter, onScrap, shift, quiet = false, arrive }: LotProps
   const isoRef = useRef<HTMLDivElement>(null);
   const walkerRef = useRef<HTMLDivElement>(null);
   const markRef = useRef<HTMLSpanElement>(null);
-  const cam = useRef({ yaw: -38, zoom: 0.72, x: 0, y: 28 });
+  const cam = useRef({ yaw: -38, zoom: 0.82, x: 0, y: 32 });
   const drag = useRef({ on: false, pan: false, lx: 0, ly: 0, moved: 0 });
   const space = useRef(false);
   const keys = useRef({ w: false, a: false, s: false, d: false });
@@ -165,7 +165,7 @@ export function Lot({ onEnter, onScrap, shift, quiet = false, arrive }: LotProps
     };
 
     const onDown = (event: PointerEvent) => {
-      if ((event.target as HTMLElement).closest(".lot__chrome, .lot__guide, .lot__dock, .lot__sheet, .lot__toast, .lot__prompt, .lot__scrap, .lot__hero")) return;
+      if ((event.target as HTMLElement).closest(".lot__chrome, .lot__guide, .lot__dock, .lot__sheet, .lot__toast, .lot__prompt, .lot__scrap, .lot__hero, .lot__plot")) return;
       wrap.setPointerCapture(event.pointerId);
       drag.current = {
         on: true,
@@ -201,7 +201,7 @@ export function Lot({ onEnter, onScrap, shift, quiet = false, arrive }: LotProps
     };
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
-      cam.current.zoom = Math.min(1.45, Math.max(0.46, cam.current.zoom - event.deltaY * 0.0012));
+      cam.current.zoom = Math.min(1.45, Math.max(0.38, cam.current.zoom - event.deltaY * 0.0012));
       paint();
     };
 
@@ -254,7 +254,7 @@ export function Lot({ onEnter, onScrap, shift, quiet = false, arrive }: LotProps
         const ry = wx * Math.sin(th) + wy * Math.cos(th);
         const sy = ry * Math.cos((58 * Math.PI) / 180);
         cam.current.x += (-rx * cam.current.zoom - cam.current.x) * 0.08;
-        cam.current.y += (-sy * cam.current.zoom + 28 - cam.current.y) * 0.08;
+        cam.current.y += (-sy * cam.current.zoom + 32 - cam.current.y) * 0.08;
         paint();
       }
 
@@ -298,7 +298,7 @@ export function Lot({ onEnter, onScrap, shift, quiet = false, arrive }: LotProps
   }, [toast]);
 
   function pick(plot: LotPlot) {
-    if (drag.current.moved > 14) return;
+    if (drag.current.moved > 28) return;
     setHot(plot.id);
     onEnter(plot.chapter, plot.exhibit);
   }
@@ -389,6 +389,7 @@ export function Lot({ onEnter, onScrap, shift, quiet = false, arrive }: LotProps
                 <span className="lot__face lot__face--north" />
                 <span className="lot__face lot__face--west" />
                 <span className="lot__face lot__face--top" />
+                <span className="lot__hit" aria-hidden />
                 <span className="lot__tag">
                   <small>{plot.dates}</small>
                   {plot.label}
