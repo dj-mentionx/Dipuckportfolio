@@ -3,19 +3,24 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import {
+  AdditiveBlending,
   BackSide,
   BufferAttribute,
   BufferGeometry,
+  Color,
+  DoubleSide,
   Group,
-  InstancedMesh,
   Line,
   LineBasicMaterial,
+  LineSegments,
   Mesh,
-  Object3D,
+  Points,
+  PointsMaterial,
+  ShaderMaterial,
   Vector3,
 } from "three";
 import { GLOBE_NODES, ORBIT_PATHS, ORBITING_ARTEFACTS, type GlobeNodeId } from "@/lib/archive";
-import { contourPositions, fibonacciPoints, greatCircle, latLngToVector } from "./math";
+import { fibonacciPoints, greatCircle, latLngToVector, ringPositions, topoPositions } from "./math";
 
 export type ProjectedMark = {
   id: string;
@@ -25,104 +30,197 @@ export type ProjectedMark = {
   kind: "node" | "artefact";
 };
 
+export type Pointer = { x: number; y: number };
+
 type SceneProps = {
   rotation: { x: number; y: number };
   focus: GlobeNodeId | null;
   hover: GlobeNodeId | null;
   dense: boolean;
   dissolving: boolean;
+  pointer: Pointer;
   onProject: (marks: ProjectedMark[]) => void;
 };
 
-const dummy = new Object3D();
 const scratch = new Vector3();
 
-function Contours({ radius, simplified }: { radius: number; simplified: boolean }) {
-  const geometry = useMemo(() => {
-    const geo = new BufferGeometry();
-    geo.setAttribute(
-      "position",
-      new BufferAttribute(contourPositions(radius, simplified ? 12 : 20, simplified ? 8 : 12, simplified ? 40 : 64), 3),
-    );
-    return geo;
-  }, [radius, simplified]);
-
-  useEffect(() => () => geometry.dispose(), [geometry]);
-
-  return (
-    <lineSegments geometry={geometry}>
-      <lineBasicMaterial color="#f5f2ec" transparent opacity={0.16} />
-    </lineSegments>
-  );
-}
-
-function DataField({ radius, count }: { radius: number; count: number }) {
-  const mesh = useRef<InstancedMesh>(null);
-  const points = useMemo(() => fibonacciPoints(count, radius * 1.012), [count, radius]);
-
-  useEffect(() => {
-    if (!mesh.current) return;
-    for (let i = 0; i < count; i += 1) {
-      dummy.position.set(points[i * 3], points[i * 3 + 1], points[i * 3 + 2]);
-      dummy.scale.setScalar(i % 17 === 0 ? 1.6 : 0.7);
-      dummy.updateMatrix();
-      mesh.current.setMatrixAt(i, dummy.matrix);
+const BODY = {
+  uniforms: { uTime: { value: 0 } },
+  vertexShader: `
+    varying vec3 vN;
+    varying vec3 vV;
+    void main() {
+      vN = normalize(normalMatrix * normal);
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      vV = normalize(-mv.xyz);
+      gl_Position = projectionMatrix * mv;
     }
-    mesh.current.instanceMatrix.needsUpdate = true;
-  }, [count, points]);
+  `,
+  fragmentShader: `
+    varying vec3 vN;
+    varying vec3 vV;
+    uniform float uTime;
+    void main() {
+      float f = pow(1.0 - abs(dot(vN, vV)), 2.6);
+      float scan = 0.04 * sin(vN.y * 28.0 + uTime * 0.7);
+      vec3 ink = vec3(0.035, 0.032, 0.03);
+      vec3 rim = vec3(1.0, 0.18, 0.1);
+      vec3 metal = vec3(0.22, 0.2, 0.18);
+      vec3 col = mix(ink, metal, f * 0.55);
+      col = mix(col, rim, f * 0.72 + scan);
+      gl_FragColor = vec4(col, 0.94);
+    }
+  `,
+};
 
-  return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
-      <sphereGeometry args={[0.006, 5, 5]} />
-      <meshBasicMaterial color="#f5f2ec" transparent opacity={0.42} />
-    </instancedMesh>
-  );
-}
-
-function Pulses({ radius }: { radius: number }) {
-  const mesh = useRef<InstancedMesh>(null);
-  const seeds = useMemo(
+function Body() {
+  const mat = useMemo(
     () =>
-      [0.12, 0.37, 0.58, 0.71, 0.88].map((t, i) => ({
-        lat: -40 + ((i * 37) % 90),
-        lng: -160 + i * 68,
-        phase: t,
-      })),
+      new ShaderMaterial({
+        uniforms: { uTime: { value: 0 } },
+        vertexShader: BODY.vertexShader,
+        fragmentShader: BODY.fragmentShader,
+        transparent: true,
+      }),
     [],
   );
 
   useFrame(({ clock }) => {
-    if (!mesh.current) return;
-    const time = clock.elapsedTime;
-    seeds.forEach((seed, index) => {
-      latLngToVector(seed.lat, seed.lng, radius * 1.03, scratch);
-      const wave = (Math.sin(time * 1.4 + seed.phase * 8) + 1) / 2;
-      dummy.position.copy(scratch);
-      dummy.scale.setScalar(0.4 + wave * 2.1);
-      dummy.updateMatrix();
-      mesh.current!.setMatrixAt(index, dummy.matrix);
-    });
-    mesh.current.instanceMatrix.needsUpdate = true;
+    mat.uniforms.uTime.value = clock.elapsedTime;
   });
 
+  useEffect(() => () => mat.dispose(), [mat]);
+
   return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, seeds.length]}>
-      <sphereGeometry args={[0.018, 10, 10]} />
-      <meshBasicMaterial color="#ff2a1a" transparent opacity={0.85} />
-    </instancedMesh>
+    <mesh material={mat}>
+      <sphereGeometry args={[0.98, 64, 64]} />
+    </mesh>
+  );
+}
+
+function Core() {
+  const inner = useRef<Mesh>(null);
+  useFrame(({ clock }) => {
+    if (!inner.current) return;
+    const s = 1 + Math.sin(clock.elapsedTime * 1.3) * 0.08;
+    inner.current.scale.setScalar(s);
+  });
+  return (
+    <group>
+      <mesh ref={inner}>
+        <sphereGeometry args={[0.2, 24, 24]} />
+        <meshBasicMaterial color="#ff2a1a" />
+      </mesh>
+      <mesh>
+        <sphereGeometry args={[0.38, 24, 24]} />
+        <meshBasicMaterial color="#ff2a1a" transparent opacity={0.16} blending={AdditiveBlending} depthWrite={false} />
+      </mesh>
+    </group>
+  );
+}
+
+function PointCloud({
+  count,
+  radius,
+  size,
+  color,
+  opacity,
+}: {
+  count: number;
+  radius: number;
+  size: number;
+  color: string;
+  opacity: number;
+}) {
+  const object = useMemo(() => {
+    const geo = new BufferGeometry();
+    geo.setAttribute("position", new BufferAttribute(fibonacciPoints(count, radius), 3));
+    const mat = new PointsMaterial({
+      color: new Color(color),
+      size,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity,
+      depthWrite: false,
+      blending: AdditiveBlending,
+    });
+    return new Points(geo, mat);
+  }, [color, count, opacity, radius, size]);
+
+  useEffect(
+    () => () => {
+      object.geometry.dispose();
+      (object.material as PointsMaterial).dispose();
+    },
+    [object],
+  );
+
+  return <primitive object={object} />;
+}
+
+function Topography({ dense }: { dense: boolean }) {
+  const object = useMemo(() => {
+    const geo = new BufferGeometry();
+    geo.setAttribute("position", new BufferAttribute(topoPositions(1.002, dense), 3));
+    const mat = new LineBasicMaterial({ color: "#d8d2c8", transparent: true, opacity: 0.22 });
+    return new LineSegments(geo, mat);
+  }, [dense]);
+
+  useEffect(
+    () => () => {
+      object.geometry.dispose();
+      (object.material as LineBasicMaterial).dispose();
+    },
+    [object],
+  );
+
+  return <primitive object={object} />;
+}
+
+function Rings() {
+  const rings = useMemo(() => {
+    const specs = [
+      { r: 1.34, x: 0.55, z: 0.12, c: "#ff2a1a", o: 0.38 },
+      { r: 1.52, x: -0.28, z: 0.4, c: "#f5f2ec", o: 0.16 },
+      { r: 1.72, x: 0.18, z: -0.52, c: "#ff2a1a", o: 0.18 },
+    ];
+    return specs.map((spec) => {
+      const geo = new BufferGeometry();
+      geo.setAttribute("position", new BufferAttribute(ringPositions(spec.r, spec.x, spec.z), 3));
+      const mat = new LineBasicMaterial({ color: spec.c, transparent: true, opacity: spec.o });
+      return new Line(geo, mat);
+    });
+  }, []);
+
+  useEffect(
+    () => () => {
+      rings.forEach((line) => {
+        line.geometry.dispose();
+        (line.material as LineBasicMaterial).dispose();
+      });
+    },
+    [rings],
+  );
+
+  return (
+    <group>
+      {rings.map((line, index) => (
+        <primitive key={index} object={line} />
+      ))}
+    </group>
   );
 }
 
 function Routes({ radius }: { radius: number }) {
   const lines = useMemo(() => {
-    const material = new LineBasicMaterial({ color: "#ff2a1a", transparent: true, opacity: 0.28 });
+    const material = new LineBasicMaterial({ color: "#ff2a1a", transparent: true, opacity: 0.42 });
     return ORBIT_PATHS.map((path) => {
       const from = GLOBE_NODES.find((node) => node.id === path.from)!;
       const to = GLOBE_NODES.find((node) => node.id === path.to)!;
       const geo = new BufferGeometry();
       geo.setAttribute(
         "position",
-        new BufferAttribute(greatCircle([from.lat, from.lng], [to.lat, to.lng], radius * 1.08), 3),
+        new BufferAttribute(greatCircle([from.lat, from.lng], [to.lat, to.lng], radius * 1.06, 80), 3),
       );
       return new Line(geo, material);
     });
@@ -147,83 +245,113 @@ function Routes({ radius }: { radius: number }) {
   );
 }
 
-function Atmosphere() {
-  return (
-    <mesh scale={1.16}>
-      <sphereGeometry args={[1, 48, 48]} />
-      <meshBasicMaterial color="#ff2a1a" transparent opacity={0.055} side={BackSide} />
-    </mesh>
-  );
-}
-
-function Dust({ count }: { count: number }) {
-  const points = useMemo(() => fibonacciPoints(count, 3.4), [count]);
-  const mesh = useRef<InstancedMesh>(null);
-
-  useEffect(() => {
-    if (!mesh.current) return;
-    for (let i = 0; i < count; i += 1) {
-      dummy.position.set(points[i * 3], points[i * 3 + 1], points[i * 3 + 2]);
-      dummy.scale.setScalar(0.35);
-      dummy.updateMatrix();
-      mesh.current.setMatrixAt(i, dummy.matrix);
-    }
-    mesh.current.instanceMatrix.needsUpdate = true;
-  }, [count, points]);
-
-  return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
-      <sphereGeometry args={[0.008, 4, 4]} />
-      <meshBasicMaterial color="#f5f2ec" transparent opacity={0.18} />
-    </instancedMesh>
-  );
-}
-
 function Courier({ radius }: { radius: number }) {
-  const ref = useRef<Mesh>(null);
+  const head = useRef<Mesh>(null);
+  const trail = useRef<Group>(null);
   const path = useMemo(() => {
     const from = GLOBE_NODES.find((node) => node.id === "chennai")!;
     const to = GLOBE_NODES.find((node) => node.id === "berlin")!;
-    const raw = greatCircle([from.lat, from.lng], [to.lat, to.lng], radius * 1.1, 96);
+    const raw = greatCircle([from.lat, from.lng], [to.lat, to.lng], radius * 1.08, 120);
     const points: Vector3[] = [];
-    for (let i = 0; i < raw.length; i += 3) {
-      points.push(new Vector3(raw[i], raw[i + 1], raw[i + 2]));
-    }
+    for (let i = 0; i < raw.length; i += 3) points.push(new Vector3(raw[i], raw[i + 1], raw[i + 2]));
     return points;
   }, [radius]);
 
   useFrame(({ clock }) => {
-    if (!ref.current || path.length < 2) return;
-    const t = (clock.elapsedTime * 0.07) % 1;
-    const index = t * (path.length - 1);
-    const a = Math.floor(index);
-    const b = Math.min(a + 1, path.length - 1);
-    ref.current.position.lerpVectors(path[a], path[b], index - a);
+    if (!head.current || path.length < 8) return;
+    const t = (clock.elapsedTime * 0.09) % 1;
+    const at = (u: number) => {
+      const index = ((u + 1) % 1) * (path.length - 1);
+      const a = Math.floor(index);
+      const b = Math.min(a + 1, path.length - 1);
+      return new Vector3().lerpVectors(path[a], path[b], index - a);
+    };
+    head.current.position.copy(at(t));
+    trail.current?.children.forEach((child, i) => {
+      child.position.copy(at(t - (i + 1) * 0.018));
+    });
   });
 
   return (
-    <mesh ref={ref}>
-      <sphereGeometry args={[0.02, 12, 12]} />
-      <meshBasicMaterial color="#ff2a1a" />
-    </mesh>
+    <group>
+      <mesh ref={head}>
+        <sphereGeometry args={[0.028, 14, 14]} />
+        <meshBasicMaterial color="#ff2a1a" />
+      </mesh>
+      <group ref={trail}>
+        {Array.from({ length: 7 }, (_, i) => (
+          <mesh key={i}>
+            <sphereGeometry args={[0.014 - i * 0.0014, 8, 8]} />
+            <meshBasicMaterial color="#ff2a1a" transparent opacity={0.55 - i * 0.06} blending={AdditiveBlending} depthWrite={false} />
+          </mesh>
+        ))}
+      </group>
+    </group>
   );
 }
 
-function LocationNodes({ radius, hover, focus }: { radius: number; hover: GlobeNodeId | null; focus: GlobeNodeId | null }) {
+function Halo() {
+  return (
+    <group>
+      <mesh scale={1.08}>
+        <sphereGeometry args={[1, 48, 48]} />
+        <meshBasicMaterial color="#ff2a1a" transparent opacity={0.07} side={BackSide} blending={AdditiveBlending} depthWrite={false} />
+      </mesh>
+      <mesh scale={1.22}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshBasicMaterial color="#ff2a1a" transparent opacity={0.04} side={BackSide} blending={AdditiveBlending} depthWrite={false} />
+      </mesh>
+      <mesh rotation={[Math.PI / 2.2, 0.2, 0.4]}>
+        <ringGeometry args={[1.28, 1.31, 80]} />
+        <meshBasicMaterial color="#f5f2ec" transparent opacity={0.12} side={DoubleSide} />
+      </mesh>
+    </group>
+  );
+}
+
+function Pins({ hover, focus }: { hover: GlobeNodeId | null; focus: GlobeNodeId | null }) {
   return (
     <group>
       {GLOBE_NODES.map((node) => {
-        const position = latLngToVector(node.lat, node.lng, radius * 1.04);
-        const active = hover === node.id || focus === node.id;
+        const position = latLngToVector(node.lat, node.lng, 1.045);
+        const on = hover === node.id || focus === node.id;
         return (
-          <mesh key={node.id} position={position.toArray()}>
-            <sphereGeometry args={[active ? 0.028 : 0.018, 12, 12]} />
-            <meshBasicMaterial color="#ff2a1a" />
+          <group key={node.id} position={position.toArray()}>
+            <mesh>
+              <sphereGeometry args={[on ? 0.034 : 0.02, 16, 16]} />
+              <meshBasicMaterial color="#ff2a1a" />
+            </mesh>
+            <mesh>
+              <sphereGeometry args={[on ? 0.07 : 0.045, 12, 12]} />
+              <meshBasicMaterial color="#ff2a1a" transparent opacity={0.22} blending={AdditiveBlending} depthWrite={false} />
+            </mesh>
+          </group>
+        );
+      })}
+      {ORBITING_ARTEFACTS.map((item) => {
+        const position = latLngToVector(item.lat, item.lng, item.altitude);
+        return (
+          <mesh key={item.id} position={position.toArray()}>
+            <octahedronGeometry args={[0.018, 0]} />
+            <meshBasicMaterial color="#f5f2ec" transparent opacity={0.85} />
           </mesh>
         );
       })}
     </group>
   );
+}
+
+function CameraRig({ dissolving, pointer }: { dissolving: boolean; pointer: Pointer }) {
+  useFrame(({ camera, clock }) => {
+    const intro = Math.min(1, clock.elapsedTime / 2.1);
+    const eased = 1 - (1 - intro) ** 3;
+    const z = dissolving ? 1.55 : 3.6 - eased * 1.85;
+    camera.position.x += (0.18 + pointer.x * 0.16 - camera.position.x) * 0.05;
+    camera.position.y += (-0.08 + pointer.y * 0.1 - camera.position.y) * 0.05;
+    camera.position.z += (z - camera.position.z) * 0.055;
+    camera.lookAt(0.08, -0.04, 0);
+  });
+  return null;
 }
 
 function Projector({
@@ -238,11 +366,10 @@ function Projector({
   useFrame(() => {
     if (!group.current) return;
     const marks: ProjectedMark[] = [];
-
     const project = (id: string, lat: number, lng: number, altitude: number, kind: ProjectedMark["kind"]) => {
       latLngToVector(lat, lng, altitude, scratch);
       scratch.applyMatrix4(group.current!.matrixWorld);
-      const facing = scratch.clone().normalize().dot(camera.position.clone().normalize()) > 0.12;
+      const facing = scratch.clone().normalize().dot(camera.position.clone().normalize()) > 0.18;
       scratch.project(camera);
       marks.push({
         id,
@@ -252,8 +379,7 @@ function Projector({
         kind,
       });
     };
-
-    GLOBE_NODES.forEach((node) => project(node.id, node.lat, node.lng, 1.12, "node"));
+    GLOBE_NODES.forEach((node) => project(node.id, node.lat, node.lng, 1.14, "node"));
     ORBITING_ARTEFACTS.forEach((item) => project(item.id, item.lat, item.lng, item.altitude, "artefact"));
     onProject(marks);
   });
@@ -261,34 +387,32 @@ function Projector({
   return null;
 }
 
-function Scene({ rotation, focus, hover, dense, dissolving, onProject }: SceneProps) {
+function Scene({ rotation, focus, hover, dense, dissolving, pointer, onProject }: SceneProps) {
   const group = useRef<Group>(null);
-  const radius = 1;
 
   useFrame(() => {
     if (!group.current) return;
-    group.current.rotation.x += (rotation.x - group.current.rotation.x) * 0.075;
-    group.current.rotation.y += (rotation.y - group.current.rotation.y) * 0.075;
-    const scale = dissolving ? 0.78 : 1;
-    group.current.scale.setScalar(group.current.scale.x + (scale - group.current.scale.x) * 0.07);
+    group.current.rotation.x += (rotation.x - group.current.rotation.x) * 0.07;
+    group.current.rotation.y += (rotation.y - group.current.rotation.y) * 0.07;
+    const scale = dissolving ? 0.72 : 1;
+    group.current.scale.setScalar(group.current.scale.x + (scale - group.current.scale.x) * 0.06);
   });
 
   return (
     <>
-      <color attach="background" args={["#080808"]} />
-      <Dust count={dense ? 420 : 180} />
-      <Atmosphere />
-      <group ref={group}>
-        <mesh>
-          <sphereGeometry args={[radius * 0.97, 48, 48]} />
-          <meshBasicMaterial color="#0a0a0a" transparent opacity={0.94} />
-        </mesh>
-        <Contours radius={radius} simplified={!dense} />
-        <DataField radius={radius} count={dense ? 1600 : 780} />
-        <Pulses radius={radius} />
-        <Routes radius={radius} />
-        <Courier radius={radius} />
-        <LocationNodes radius={radius} hover={hover} focus={focus} />
+      <color attach="background" args={["#050505"]} />
+      <CameraRig dissolving={dissolving} pointer={pointer} />
+      <PointCloud count={dense ? 900 : 380} radius={4.6} size={0.012} color="#f5f2ec" opacity={0.28} />
+      <Halo />
+      <group ref={group} position={[0.22, -0.12, 0]} scale={1.18}>
+        <Body />
+        <Core />
+        <Topography dense={dense} />
+        <PointCloud count={dense ? 2200 : 1100} radius={1.015} size={0.01} color="#f5f2ec" opacity={0.55} />
+        <Rings />
+        <Routes radius={1} />
+        <Courier radius={1} />
+        <Pins hover={hover} focus={focus} />
       </group>
       <Projector group={group} onProject={onProject} />
     </>
@@ -298,11 +422,11 @@ function Scene({ rotation, focus, hover, dense, dissolving, onProject }: ScenePr
 export function GlobeCanvas(props: SceneProps) {
   return (
     <Canvas
-      dpr={[1, 1.25]}
-      gl={{ antialias: true, alpha: true, powerPreference: "default", failIfMajorPerformanceCaveat: false }}
-      camera={{ position: [0, 0.08, 2.72], fov: 42 }}
+      dpr={[1, 1.5]}
+      gl={{ antialias: true, alpha: true, powerPreference: "high-performance", failIfMajorPerformanceCaveat: false }}
+      camera={{ position: [0.2, -0.06, 3.5], fov: 32 }}
       onCreated={({ gl }) => {
-        gl.setClearColor("#080808", 0);
+        gl.setClearColor("#050505", 0);
       }}
     >
       <Scene {...props} />

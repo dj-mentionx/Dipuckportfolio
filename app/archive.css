@@ -1439,8 +1439,17 @@ body.is-home .archive {
   margin: 0;
   border: 0;
   background:
-    radial-gradient(circle at 50% 48%, rgba(255, 42, 26, 0.16), transparent 34%),
-    #080808;
+    radial-gradient(circle at 62% 58%, rgba(255, 42, 26, 0.28), transparent 28%),
+    radial-gradient(circle at 70% 70%, rgba(255, 42, 26, 0.08), transparent 46%),
+    #050505;
+}
+
+.field-home .globe__label {
+  opacity: 0;
+}
+
+.field-home .globe__label.is-on {
+  opacity: 1;
 }
 
 .field-home.is-booting .globe canvas,
@@ -1458,60 +1467,56 @@ body.is-home .archive {
   transition: opacity 1.1s ease, filter 1.2s ease, transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.field-home__ghost {
+.field-home__lock {
   pointer-events: none;
   position: absolute;
-  left: 50%;
-  top: 46%;
-  z-index: 2;
-  margin: 0;
-  transform: translate(-50%, -50%);
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(92px, 24vw, 320px);
-  font-weight: 400;
-  letter-spacing: -0.06em;
-  line-height: 0.8;
-  color: transparent;
-  -webkit-text-stroke: 1px rgba(255, 42, 26, 0.2);
-  mix-blend-mode: screen;
-}
-
-.field-home__copy {
-  pointer-events: none;
-  position: absolute;
-  z-index: 4;
-  top: 22vh;
-  max-width: 16ch;
-}
-
-.field-home__copy h1,
-.field-home__copy h2 {
-  margin: 0;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(28px, 3.6vw, 52px);
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 1.02;
-}
-
-.field-home__copy--left {
   left: 4vw;
+  top: 18vh;
+  z-index: 4;
+  max-width: min(16ch, 52vw);
 }
 
-.field-home__copy--right {
-  right: 4vw;
-  top: auto;
-  bottom: 28vh;
-  text-align: right;
+.field-home__lock h1 {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(44px, 8.4vw, 118px);
+  font-weight: 400;
+  letter-spacing: -0.055em;
+  line-height: 0.88;
 }
 
-.field-home__copy--right p {
-  margin: 14px 0 0;
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--metal);
+.field-home__lock h1 span {
+  display: block;
+}
+
+.field-home__after {
+  margin: 22px 0 0;
+  max-width: 22ch;
+  font-size: clamp(18px, 2vw, 26px);
+  line-height: 1.3;
+  color: var(--mute);
+}
+
+.field-home__places {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+}
+
+.field-home__places button {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--dim);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(18px, 2vw, 28px);
+  letter-spacing: -0.03em;
+}
+
+.field-home__places button.is-on,
+.field-home__places button:hover {
+  color: var(--red);
 }
 
 .field-home__vignette {
@@ -1547,32 +1552,17 @@ body.is-home .archive {
   right: 0;
   bottom: 0;
   z-index: 6;
-  display: grid;
-  gap: 10px;
-  padding: 0 4vw 22px;
-}
-
-.field-home .globe__hint,
-.field-home .globe__rail {
-  width: 100%;
-  margin: 0;
-}
-
-.field-home .globe__rail {
-  gap: 6px;
-}
-
-.field-home .globe__rail a,
-.field-home .globe__rail button {
-  border-color: rgba(245, 242, 236, 0.1);
-  background: rgba(8, 8, 8, 0.35);
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  padding: 0 4vw 28px;
 }
 
 .field-home__descend {
-  justify-self: start;
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 11px;
-  letter-spacing: 0.22em;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 18px;
+  letter-spacing: -0.03em;
   color: var(--red);
 }
 
@@ -1623,32 +1613,22 @@ body.is-home .archive {
     margin: 0;
   }
 
-  .field-home__ghost {
-    font-size: 22vw;
-    top: 38%;
-  }
-
-  .field-home__copy {
+  .field-home__lock {
     top: 12vh;
     max-width: 18ch;
   }
 
-  .field-home__copy--right,
-  .field-home__copy--left .kicker {
-    display: none;
+  .field-home__lock h1 {
+    font-size: clamp(36px, 12vw, 56px);
   }
 
-  .field-home__copy h1,
-  .field-home__copy h2 {
-    font-size: clamp(24px, 7vw, 34px);
+  .field-home__dock {
+    flex-direction: column;
+    align-items: start;
   }
 
   .field-home .globe__card {
     width: 128px;
-  }
-
-  .field-home .globe__rail--work {
-    display: none;
   }
 
   .globe__card {
