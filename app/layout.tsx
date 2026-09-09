@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Instrument_Serif, Syne } from "next/font/google";
 import "./globals.css";
-import "./archive.css";
 import { PERSON, POSITIONING, SITE_URL } from "@/lib/archive";
 
 const sans = Syne({
@@ -28,12 +27,12 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Dipuck Jones // Signal Archive",
+    default: "Dipuck Jones — THE LOT",
     template: "%s — Dipuck Jones",
   },
-  description: POSITIONING.description,
+  description: "A darkroom rack of prints you can rotate. 13 years of B2B SaaS growth, MentionX, Berlin.",
   openGraph: {
-    title: "Dipuck Jones // Signal Archive",
+    title: "Dipuck Jones — THE LOT",
     description: POSITIONING.argument,
     url: SITE_URL,
     siteName: PERSON.name,
@@ -42,7 +41,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dipuck Jones // Signal Archive",
+    title: "Dipuck Jones — THE LOT",
     description: POSITIONING.argument,
   },
 };

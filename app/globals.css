@@ -27,6 +27,12 @@ body {
   overflow-x: hidden;
 }
 
+html.lockup-root,
+html.lockup-root body {
+  overflow: hidden;
+  height: 100%;
+}
+
 button,
 input {
   font: inherit;

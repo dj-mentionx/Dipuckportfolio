@@ -58,6 +58,11 @@ export function Experience() {
     setShift(loadShift());
   }, []);
 
+  useEffect(() => {
+    document.documentElement.classList.add("lockup-root");
+    return () => document.documentElement.classList.remove("lockup-root");
+  }, []);
+
   function patchShift(next: (prev: ShiftState) => ShiftState) {
     setShift((prev) => {
       const updated = next(prev);
