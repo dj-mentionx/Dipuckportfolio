@@ -409,7 +409,7 @@ function Scene({ rotation, focus, hover, dense, dissolving, pointer, onProject }
       <color attach="background" args={["#050505"]} />
       <CameraRig dissolving={dissolving} pointer={pointer} />
       <PointCloud count={dense ? 700 : 280} radius={5.2} size={0.01} color="#f5f2ec" opacity={0.22} />
-      <group ref={group} position={[0.32, 0, 0]}>
+      <group ref={group} position={[0.38, 0.02, 0]} scale={1.15}>
         <Halo />
         <Body />
         <Core />
