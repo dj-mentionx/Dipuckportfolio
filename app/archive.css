@@ -632,10 +632,23 @@ a {
 }
 
 .story-panel li {
-  display: flex;
-  gap: 10px;
   margin-bottom: 6px;
   font-size: 13px;
+}
+
+.story-panel li button {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.story-panel li button:hover {
+  color: var(--red);
 }
 
 .story-panel span {
@@ -1400,6 +1413,180 @@ a {
   to { transform: none; opacity: 1; }
 }
 
+body.is-home .archive {
+  padding-top: 0;
+}
+
+.nav.is-field {
+  background: linear-gradient(180deg, rgba(8, 8, 8, 0.72), transparent);
+  border-bottom: 0;
+  backdrop-filter: none;
+}
+
+.field-home {
+  padding: 0;
+  min-height: 100dvh;
+  background: #080808;
+}
+
+.field-home .globe-fallback {
+  height: 100%;
+  padding: 18vh 4vw 26vh;
+}
+
+.field-home .globe {
+  height: 100dvh;
+  margin: 0;
+  border: 0;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(255, 42, 26, 0.16), transparent 34%),
+    #080808;
+}
+
+.field-home.is-booting .globe canvas,
+.field-home.is-booting .globe-fallback {
+  opacity: 0;
+  filter: blur(16px);
+  transform: scale(0.92);
+}
+
+.field-home.is-live .globe canvas,
+.field-home.is-live .globe-fallback {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  transition: opacity 1.1s ease, filter 1.2s ease, transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.field-home__ghost {
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: 2;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(92px, 24vw, 320px);
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 42, 26, 0.2);
+  mix-blend-mode: screen;
+}
+
+.field-home__copy {
+  pointer-events: none;
+  position: absolute;
+  z-index: 4;
+  top: 22vh;
+  max-width: 16ch;
+}
+
+.field-home__copy h1,
+.field-home__copy h2 {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(28px, 3.6vw, 52px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+}
+
+.field-home__copy--left {
+  left: 4vw;
+}
+
+.field-home__copy--right {
+  right: 4vw;
+  top: auto;
+  bottom: 28vh;
+  text-align: right;
+}
+
+.field-home__copy--right p {
+  margin: 14px 0 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--metal);
+}
+
+.field-home__vignette {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background:
+    linear-gradient(180deg, rgba(8, 8, 8, 0.35) 0, transparent 18%, transparent 62%, rgba(8, 8, 8, 0.88) 100%),
+    radial-gradient(ellipse at center, transparent 42%, rgba(8, 8, 8, 0.55) 100%);
+}
+
+.field-home .globe__card {
+  width: 168px;
+  padding: 10px 12px 12px;
+  border-color: rgba(245, 242, 236, 0.1);
+  background: rgba(8, 8, 8, 0.55);
+}
+
+.field-home .globe__card span {
+  display: none;
+}
+
+.field-home .globe__card strong {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.field-home__dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6;
+  display: grid;
+  gap: 10px;
+  padding: 0 4vw 22px;
+}
+
+.field-home .globe__hint,
+.field-home .globe__rail {
+  width: 100%;
+  margin: 0;
+}
+
+.field-home .globe__rail {
+  gap: 6px;
+}
+
+.field-home .globe__rail a,
+.field-home .globe__rail button {
+  border-color: rgba(245, 242, 236, 0.1);
+  background: rgba(8, 8, 8, 0.35);
+}
+
+.field-home__descend {
+  justify-self: start;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--red);
+}
+
+.cut {
+  width: min(1120px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 140px 0 40px;
+  border-top: 1px solid rgba(255, 42, 26, 0.28);
+}
+
+.story-panel__hold {
+  margin-top: 8px;
+}
+
 @media (max-width: 900px) {
   .nav {
     grid-template-columns: 1fr auto;
@@ -1431,6 +1618,42 @@ a {
     margin: 0 12px;
   }
 
+  .field-home .globe {
+    height: 100dvh;
+    margin: 0;
+  }
+
+  .field-home__ghost {
+    font-size: 22vw;
+    top: 38%;
+  }
+
+  .field-home__copy {
+    top: 14vh;
+    max-width: 20ch;
+  }
+
+  .field-home__copy--right {
+    left: 4vw;
+    right: auto;
+    top: auto;
+    bottom: 34vh;
+    text-align: left;
+  }
+
+  .field-home__copy h1,
+  .field-home__copy h2 {
+    font-size: clamp(24px, 7vw, 34px);
+  }
+
+  .field-home .globe__card {
+    width: 128px;
+  }
+
+  .field-home .globe__rail--work {
+    display: none;
+  }
+
   .globe__card {
     width: 148px;
     padding: 8px 10px;
@@ -1459,7 +1682,10 @@ a {
   .now-mx__engine span,
   .radar__sweep,
   .nav__line,
-  .case-visual--align span {
+  .case-visual--align span,
+  .field-home.is-live .globe canvas,
+  .field-home.is-live .globe-fallback {
     animation: none;
+    transition: none;
   }
 }

@@ -12,14 +12,14 @@ import {
 } from "@/lib/archive";
 import dynamic from "next/dynamic";
 import type { ProjectedMark } from "./GlobeCanvas";
+import { GlobeFallback } from "./GlobeFallback";
+import { facingRotation } from "./math";
+import { StoryPanel } from "./StoryPanel";
 
 const GlobeCanvas = dynamic(() => import("./GlobeCanvas").then((mod) => mod.GlobeCanvas), {
   ssr: false,
   loading: () => <div className="globe__boot" />,
 });
-import { GlobeFallback } from "./GlobeFallback";
-import { facingRotation } from "./math";
-import { StoryPanel } from "./StoryPanel";
 
 const POSE_KEY = "signal-field-pose";
 
@@ -34,10 +34,8 @@ function readPose(): Pose | null {
   }
 }
 
-export function GlobalSignalField() {
+export function GlobalSignalField({ home = false }: { home?: boolean }) {
   const router = useRouter();
-  const stage = useRef<HTMLDivElement>(null);
-  const marksRef = useRef<ProjectedMark[]>([]);
   const nodeEls = useRef<Record<string, HTMLButtonElement | null>>({});
   const cardEls = useRef<Record<string, HTMLAnchorElement | null>>({});
   const dragging = useRef(false);
@@ -46,9 +44,10 @@ export function GlobalSignalField() {
   const [dense, setDense] = useState(false);
   const [hover, setHover] = useState<GlobeNodeId | null>(null);
   const [focus, setFocus] = useState<GlobeNodeId | null>(null);
-  const [rotation, setRotation] = useState({ x: -0.28, y: 2.35 });
+  const [rotation, setRotation] = useState({ x: -0.22, y: 2.42 });
   const [dissolving, setDissolving] = useState(false);
   const [ready, setReady] = useState(false);
+  const [live, setLive] = useState(false);
 
   useEffect(() => {
     const useFallback = shouldUseGlobeFallback();
@@ -58,6 +57,10 @@ export function GlobalSignalField() {
     if (stored) {
       setRotation({ x: stored.x, y: stored.y });
       setFocus(stored.node);
+      setLive(true);
+    } else {
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.setTimeout(() => setLive(true), reduce ? 0 : 720);
     }
     setReady(true);
   }, []);
@@ -84,31 +87,34 @@ export function GlobalSignalField() {
       setRotation(facing);
       setFocus(id);
       persist({ ...facing, node: id });
-      document.documentElement.style.setProperty("--field-tint", GLOBE_NODES.find((item) => item.id === id)?.tint ?? "8 8 8");
+      document.documentElement.style.setProperty("--field-tint", node.tint);
     },
     [persist],
   );
 
-  const onProject = useCallback((marks: ProjectedMark[]) => {
-    marksRef.current = marks;
-    marks.forEach((mark) => {
-      const el = mark.kind === "node" ? nodeEls.current[mark.id] : cardEls.current[mark.id];
-      if (!el) return;
-      const behind = mark.z > 0.92;
-      const pull = highlighted.has(mark.id) ? 0.92 : 1;
-      el.style.transform = `translate3d(${mark.x}px, ${mark.y}px, 0) scale(${behind ? 0.86 : pull})`;
-      el.style.opacity = behind
+  const onProject = useCallback(
+    (marks: ProjectedMark[]) => {
+      marks.forEach((mark) => {
+        const el = mark.kind === "node" ? nodeEls.current[mark.id] : cardEls.current[mark.id];
+        if (!el) return;
+        const behind = mark.z > 0.92;
+        const pull = highlighted.has(mark.id) ? 1.04 : 0.96;
+        el.style.transform = `translate3d(${mark.x}px, ${mark.y}px, 0) translate(-50%, -50%) scale(${behind ? 0.8 : pull})`;
+        el.style.opacity = behind
           ? "0"
           : highlighted.size && !highlighted.has(mark.id) && mark.kind === "artefact"
-            ? "0.38"
+            ? "0.22"
             : "1";
-      el.style.zIndex = String(40 + Math.round((1 - mark.z) * 20));
-      el.hidden = behind;
-      el.style.pointerEvents = behind ? "none" : "auto";
-    });
-  }, [highlighted]);
+        el.style.zIndex = String(40 + Math.round((1 - mark.z) * 20));
+        el.hidden = behind;
+        el.style.pointerEvents = behind ? "none" : "auto";
+      });
+    },
+    [highlighted],
+  );
 
   function pointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    if ((event.target as HTMLElement).closest("a, button, aside")) return;
     dragging.current = true;
     last.current = { x: event.clientX, y: event.clientY };
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -121,8 +127,8 @@ export function GlobalSignalField() {
     last.current = { x: event.clientX, y: event.clientY };
     setRotation((prev) => {
       const next = {
-        x: Math.max(-0.9, Math.min(0.9, prev.x + dy * 0.005)),
-        y: prev.y + dx * 0.006,
+        x: Math.max(-0.9, Math.min(0.9, prev.x + dy * 0.0045)),
+        y: prev.y + dx * 0.0055,
       };
       persist({ ...next, node: focus });
       return next;
@@ -136,25 +142,15 @@ export function GlobalSignalField() {
   function openArtefact(href: string) {
     persist({ ...rotation, node: focus });
     setDissolving(true);
-    window.setTimeout(() => router.push(href), 420);
+    window.setTimeout(() => router.push(href), 520);
   }
 
   return (
     <section
       id="archive"
-      className={`field-section${dissolving ? " is-dissolving" : ""}${focus ? ` is-${focus}` : ""}`}
+      className={`field-section${home ? " field-home" : ""}${live ? " is-live" : " is-booting"}${dissolving ? " is-dissolving" : ""}${focus ? ` is-${focus}` : ""}`}
     >
-      <div className="section-head">
-        <p className="kicker">03 / GLOBAL SIGNAL FIELD</p>
-        <h2>The work is the proof.</h2>
-        <p className="lede">
-          Every company, project and product started with a signal: an opportunity hidden inside fragmented
-          execution, unclear demand or changing buyer behaviour.
-        </p>
-      </div>
-
       <div
-        ref={stage}
         className="globe"
         data-cursor="explore-signals"
         onPointerDown={pointerDown}
@@ -162,6 +158,22 @@ export function GlobalSignalField() {
         onPointerUp={pointerUp}
         onPointerCancel={pointerUp}
       >
+        {home ? (
+          <>
+            <p className="field-home__ghost" aria-hidden>
+              SIGNAL
+            </p>
+            <div className="field-home__copy field-home__copy--left">
+              <p className="kicker">DIPUCK JONES / BERLIN / GROWTH SYSTEMS</p>
+              <h1>I find the signal inside broken growth systems.</h1>
+            </div>
+            <div className="field-home__copy field-home__copy--right">
+              <h2>Then I build what makes them move.</h2>
+              <p>Paid. SEO. AI discovery. Conversion. One commercial system.</p>
+            </div>
+          </>
+        ) : null}
+
         {ready && !fallback ? (
           <GlobeCanvas
             rotation={rotation}
@@ -219,38 +231,45 @@ export function GlobalSignalField() {
                 <em>{item.number}</em>
                 <strong>{item.name}</strong>
                 <span>{item.category}</span>
-                <small>{item.impact}</small>
               </a>
             ))
           : null}
 
-        {focus ? <StoryPanel nodeId={focus} onClose={() => setFocus(null)} /> : null}
+        {focus ? <StoryPanel nodeId={focus} onClose={() => setFocus(null)} onOpen={openArtefact} /> : null}
+
+        <div className="field-home__vignette" aria-hidden />
       </div>
 
-      <p className="globe__hint">Drag to rotate. Touch to explore. Artefacts sit on signal routes, not in orbit noise.</p>
-      <div className="globe__rail" aria-label="Locations">
-        {GLOBE_NODES.map((node) => (
-          <button
-            key={node.id}
-            type="button"
-            className={focus === node.id || hover === node.id ? "is-on" : undefined}
-            data-cursor="explore-signals"
-            onClick={() => focusNode(node.id)}
-            onPointerEnter={() => setHover(node.id)}
-            onPointerLeave={() => setHover(null)}
-          >
-            <em>{node.role}</em>
-            {node.name}
-          </button>
-        ))}
-      </div>
-      <div className="globe__rail" aria-label="Artefacts">
-        {ORBITING_ARTEFACTS.map((item) => (
-          <Link key={item.id} href={item.href} data-cursor={item.cursor}>
-            <em>{item.number}</em>
-            {item.name}
-          </Link>
-        ))}
+      <div className="field-home__dock">
+        <p className="globe__hint">Drag the field. Artefacts ride the Chennai–Berlin route.</p>
+        <div className="globe__rail" aria-label="Locations">
+          {GLOBE_NODES.map((node) => (
+            <button
+              key={node.id}
+              type="button"
+              className={focus === node.id || hover === node.id ? "is-on" : undefined}
+              data-cursor="explore-signals"
+              onClick={() => focusNode(node.id)}
+              onPointerEnter={() => setHover(node.id)}
+              onPointerLeave={() => setHover(null)}
+            >
+              {node.name}
+            </button>
+          ))}
+        </div>
+        <div className="globe__rail globe__rail--work" aria-label="Artefacts">
+          {ORBITING_ARTEFACTS.map((item) => (
+            <Link key={item.id} href={item.href} data-cursor={item.cursor}>
+              <em>{item.number}</em>
+              {item.name}
+            </Link>
+          ))}
+        </div>
+        {home ? (
+          <a href="#system" className="field-home__descend">
+            THE SYSTEM BELOW ↓
+          </a>
+        ) : null}
       </div>
     </section>
   );

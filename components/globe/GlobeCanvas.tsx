@@ -3,12 +3,14 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import {
+  BackSide,
   BufferAttribute,
   BufferGeometry,
   Group,
   InstancedMesh,
   Line,
   LineBasicMaterial,
+  Mesh,
   Object3D,
   Vector3,
 } from "three";
@@ -145,6 +147,68 @@ function Routes({ radius }: { radius: number }) {
   );
 }
 
+function Atmosphere() {
+  return (
+    <mesh scale={1.16}>
+      <sphereGeometry args={[1, 48, 48]} />
+      <meshBasicMaterial color="#ff2a1a" transparent opacity={0.055} side={BackSide} />
+    </mesh>
+  );
+}
+
+function Dust({ count }: { count: number }) {
+  const points = useMemo(() => fibonacciPoints(count, 3.4), [count]);
+  const mesh = useRef<InstancedMesh>(null);
+
+  useEffect(() => {
+    if (!mesh.current) return;
+    for (let i = 0; i < count; i += 1) {
+      dummy.position.set(points[i * 3], points[i * 3 + 1], points[i * 3 + 2]);
+      dummy.scale.setScalar(0.35);
+      dummy.updateMatrix();
+      mesh.current.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.current.instanceMatrix.needsUpdate = true;
+  }, [count, points]);
+
+  return (
+    <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
+      <sphereGeometry args={[0.008, 4, 4]} />
+      <meshBasicMaterial color="#f5f2ec" transparent opacity={0.18} />
+    </instancedMesh>
+  );
+}
+
+function Courier({ radius }: { radius: number }) {
+  const ref = useRef<Mesh>(null);
+  const path = useMemo(() => {
+    const from = GLOBE_NODES.find((node) => node.id === "chennai")!;
+    const to = GLOBE_NODES.find((node) => node.id === "berlin")!;
+    const raw = greatCircle([from.lat, from.lng], [to.lat, to.lng], radius * 1.1, 96);
+    const points: Vector3[] = [];
+    for (let i = 0; i < raw.length; i += 3) {
+      points.push(new Vector3(raw[i], raw[i + 1], raw[i + 2]));
+    }
+    return points;
+  }, [radius]);
+
+  useFrame(({ clock }) => {
+    if (!ref.current || path.length < 2) return;
+    const t = (clock.elapsedTime * 0.07) % 1;
+    const index = t * (path.length - 1);
+    const a = Math.floor(index);
+    const b = Math.min(a + 1, path.length - 1);
+    ref.current.position.lerpVectors(path[a], path[b], index - a);
+  });
+
+  return (
+    <mesh ref={ref}>
+      <sphereGeometry args={[0.02, 12, 12]} />
+      <meshBasicMaterial color="#ff2a1a" />
+    </mesh>
+  );
+}
+
 function LocationNodes({ radius, hover, focus }: { radius: number; hover: GlobeNodeId | null; focus: GlobeNodeId | null }) {
   return (
     <group>
@@ -203,24 +267,27 @@ function Scene({ rotation, focus, hover, dense, dissolving, onProject }: ScenePr
 
   useFrame(() => {
     if (!group.current) return;
-    group.current.rotation.x += (rotation.x - group.current.rotation.x) * 0.08;
-    group.current.rotation.y += (rotation.y - group.current.rotation.y) * 0.08;
-    const scale = dissolving ? 0.84 : 1;
-    group.current.scale.setScalar(group.current.scale.x + (scale - group.current.scale.x) * 0.08);
+    group.current.rotation.x += (rotation.x - group.current.rotation.x) * 0.075;
+    group.current.rotation.y += (rotation.y - group.current.rotation.y) * 0.075;
+    const scale = dissolving ? 0.78 : 1;
+    group.current.scale.setScalar(group.current.scale.x + (scale - group.current.scale.x) * 0.07);
   });
 
   return (
     <>
       <color attach="background" args={["#080808"]} />
+      <Dust count={dense ? 420 : 180} />
+      <Atmosphere />
       <group ref={group}>
         <mesh>
-          <sphereGeometry args={[radius * 0.98, 32, 32]} />
-          <meshBasicMaterial color="#0c0c0c" transparent opacity={0.92} />
+          <sphereGeometry args={[radius * 0.97, 48, 48]} />
+          <meshBasicMaterial color="#0a0a0a" transparent opacity={0.94} />
         </mesh>
         <Contours radius={radius} simplified={!dense} />
-        <DataField radius={radius} count={dense ? 1400 : 720} />
+        <DataField radius={radius} count={dense ? 1600 : 780} />
         <Pulses radius={radius} />
         <Routes radius={radius} />
+        <Courier radius={radius} />
         <LocationNodes radius={radius} hover={hover} focus={focus} />
       </group>
       <Projector group={group} onProject={onProject} />
@@ -233,7 +300,7 @@ export function GlobeCanvas(props: SceneProps) {
     <Canvas
       dpr={[1, 1.25]}
       gl={{ antialias: true, alpha: true, powerPreference: "default", failIfMajorPerformanceCaveat: false }}
-      camera={{ position: [0, 0.15, 3.35], fov: 38 }}
+      camera={{ position: [0, 0.08, 2.72], fov: 42 }}
       onCreated={({ gl }) => {
         gl.setClearColor("#080808", 0);
       }}

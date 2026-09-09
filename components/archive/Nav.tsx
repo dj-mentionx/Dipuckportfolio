@@ -20,7 +20,7 @@ export function Nav() {
 
   return (
     <>
-      <header className="nav">
+      <header className={`nav${pathname === "/" ? " is-field" : ""}`}>
         <Link href="/" className="nav__mark" data-cursor="open-signal">
           <span>DIPUCK JONES</span>
           <small>SIGNAL ARCHIVE</small>

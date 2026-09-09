@@ -5,9 +5,11 @@ import { GLOBE_NODES, ORBITING_ARTEFACTS, type GlobeNodeId } from "@/lib/archive
 export function StoryPanel({
   nodeId,
   onClose,
+  onOpen,
 }: {
   nodeId: GlobeNodeId;
   onClose: () => void;
+  onOpen?: (href: string) => void;
 }) {
   const node = GLOBE_NODES.find((item) => item.id === nodeId);
   if (!node) return null;
@@ -22,12 +24,18 @@ export function StoryPanel({
       <ul>
         {related.map((item) => (
           <li key={item.id}>
-            <span>{item.number}</span>
-            {item.name}
+            <button
+              type="button"
+              data-cursor={item.cursor}
+              onClick={() => onOpen?.(item.href)}
+            >
+              <span>{item.number}</span>
+              {item.name}
+            </button>
           </li>
         ))}
       </ul>
-      <button type="button" onClick={onClose}>
+      <button type="button" className="story-panel__hold" onClick={onClose}>
         Hold position
       </button>
     </aside>
