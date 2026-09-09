@@ -1112,44 +1112,81 @@ a {
   position: absolute;
   left: 0;
   top: 0;
-  width: 220px;
-  height: 220px;
-  margin: -110px;
+  width: 248px;
+  height: 248px;
+  margin: -124px;
   border-radius: 50%;
-  border: 1px solid rgba(225, 6, 0, 0.55);
+  border: 14px solid #1c1c24;
   background:
-    radial-gradient(circle, rgba(225, 6, 0, 0.22), transparent 72%),
-    repeating-conic-gradient(from 0deg, rgba(244, 244, 240, 0.05) 0 8deg, transparent 8deg 16deg);
-  box-shadow: 0 0 48px rgba(225, 6, 0, 0.22);
+    radial-gradient(circle, rgba(225, 6, 0, 0.28), transparent 68%),
+    #14141a;
+  box-shadow:
+    inset 0 0 0 3px #2e2e38,
+    0 0 0 4px #0c0c10,
+    0 0 0 10px #18181f,
+    0 0 56px rgba(225, 6, 0, 0.28);
   transform: translateZ(2px);
   pointer-events: none;
 }
 
-.lot__ring {
+.lot__boulevard {
   position: absolute;
   left: 0;
   top: 0;
-  width: 860px;
-  height: 860px;
-  margin: -430px;
+  width: 848px;
+  height: 848px;
+  margin: -424px;
   border-radius: 50%;
-  border: 1px dashed rgba(225, 6, 0, 0.22);
+  border: 56px solid #17171e;
+  box-shadow:
+    inset 0 0 0 4px #303038,
+    0 0 0 4px #303038,
+    inset 0 0 0 16px #101016,
+    0 0 0 16px #101016;
+  background: transparent;
   transform: translateZ(1px);
   pointer-events: none;
 }
 
-.lot__spoke {
+.lot__boulevard::before {
+  content: "";
+  position: absolute;
+  inset: -30px;
+  border-radius: 50%;
+  border: 3px dashed rgba(244, 244, 240, 0.55);
+  pointer-events: none;
+}
+
+.lot__street {
   position: absolute;
   left: 0;
   top: 0;
-  height: 22px;
+  height: 56px;
   background:
-    repeating-linear-gradient(90deg, rgba(244, 244, 240, 0.28) 0 14px, transparent 14px 28px) 50% 50% / 100% 2px no-repeat,
-    linear-gradient(90deg, transparent, rgba(225, 6, 0, 0.18), transparent),
-    #121218;
+    linear-gradient(#2c2c34, #2c2c34) 0 0 / 100% 4px no-repeat,
+    linear-gradient(#2c2c34, #2c2c34) 0 100% / 100% 4px no-repeat,
+    linear-gradient(180deg, #1a1a22 0%, #121218 45%, #1a1a22 100%);
   transform-origin: center;
   pointer-events: none;
-  box-shadow: 0 0 0 1px rgba(225, 6, 0, 0.12);
+  box-shadow:
+    0 -8px 0 #0d0d11,
+    0 8px 0 #0d0d11,
+    inset 0 0 0 1px rgba(225, 6, 0, 0.12);
+}
+
+.lot__street-lane {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 50%;
+  height: 3px;
+  margin-top: -1.5px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(244, 244, 240, 0.78) 0 18px,
+    transparent 18px 40px
+  );
+  pointer-events: none;
 }
 
 .lot__hero {
@@ -1265,7 +1302,7 @@ a {
 .lot__face {
   position: absolute;
   backface-visibility: hidden;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .lot__face--top {
@@ -1332,15 +1369,17 @@ a {
 }
 
 .lot__plot.kind-product .lot__face--top {
-  background: linear-gradient(135deg, #e10600 0 18%, #1a0a0a 18%);
+  background:
+    linear-gradient(135deg, rgba(225, 6, 0, 0.22), transparent 42%),
+    #16161c;
 }
 
 .lot__plot.kind-product .lot__face--south,
 .lot__plot.kind-product .lot__face--east {
   background:
-    repeating-linear-gradient(to right, transparent 0 10px, rgba(225, 6, 0, 0.7) 10px 14px),
-    repeating-linear-gradient(to bottom, rgba(8, 8, 10, 0.25) 0 9px, transparent 9px 20px),
-    #2a0808;
+    repeating-linear-gradient(to right, transparent 0 11px, rgba(225, 6, 0, 0.38) 11px 15px),
+    repeating-linear-gradient(to bottom, rgba(8, 8, 10, 0.35) 0 10px, transparent 10px 22px),
+    #1a1a22;
 }
 
 .lot__plot.kind-write .lot__face--top {
@@ -1358,10 +1397,8 @@ a {
 
 .lot__plot.is-hot .lot__face--top,
 .lot__plot:hover .lot__face--top {
-  box-shadow:
-    inset 0 0 0 1px #e10600,
-    0 0 28px rgba(225, 6, 0, 0.35);
-  filter: brightness(1.16);
+  filter: none;
+  box-shadow: inset 0 0 0 1px rgba(244, 244, 240, 0.1);
 }
 
 .lot__print {
@@ -1399,20 +1436,22 @@ a {
   min-width: 154px;
   max-width: 190px;
   padding: 11px 12px 12px;
-  background: rgba(5, 5, 7, 0.92);
-  border: 1px solid rgba(225, 6, 0, 0.55);
+  background: rgba(5, 5, 7, 0.94);
+  border: 1px solid rgba(225, 6, 0, 0.7);
   color: #f4f4f0;
   font-family: var(--font-sans), system-ui, sans-serif;
   font-size: 17px;
   font-weight: 800;
   letter-spacing: -0.045em;
   line-height: 1;
+  opacity: 1;
   pointer-events: auto;
   cursor: pointer;
   transform: translate(-50%, -108%) translateZ(calc(var(--bh) + 22px)) rotateZ(calc(var(--yaw) * -1)) rotateX(-58deg);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
   animation: tag-bob 3.6s ease-in-out infinite;
   animation-delay: var(--float-delay, 0s);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .lot__tag small {
@@ -1631,28 +1670,22 @@ a {
   box-shadow: 0 0 0 2px #e10600, 0 0 40px rgba(225, 6, 0, 0.35);
 }
 
-.lot__plot.is-latent:not(.kind-filler) .lot__face--south,
-.lot__plot.is-latent:not(.kind-filler) .lot__face--east {
-  background: #0e0e14;
-}
-
-.lot__plot.is-latent .lot__tag {
-  opacity: 0.42;
-  border-style: dashed;
-}
-
-.lot__plot.is-shot:not(.kind-filler) .lot__face--south,
-.lot__plot.is-shot:not(.kind-filler) .lot__face--east {
-  background:
-    repeating-linear-gradient(to right, transparent 0 10px, rgba(225, 6, 0, 0.82) 10px 14px),
-    repeating-linear-gradient(to bottom, rgba(8, 8, 10, 0.2) 0 9px, transparent 9px 20px),
-    #241010;
-}
-
-.lot__plot.is-near .lot__face--top {
+.lot__plot.is-hot .lot__tag,
+.lot__plot:hover .lot__tag,
+.lot__plot.is-near .lot__tag {
+  opacity: 1;
+  border-color: #e10600;
+  border-style: solid;
+  color: #f4f4f0;
+  background: rgba(5, 5, 7, 0.96);
   box-shadow:
-    inset 0 0 0 2px #e10600,
-    0 0 36px rgba(225, 6, 0, 0.55);
+    0 0 0 1px #e10600,
+    0 12px 32px rgba(225, 6, 0, 0.35);
+  filter: none;
+}
+
+.lot__plot.is-read .lot__tag {
+  border-color: rgba(225, 6, 0, 0.85);
 }
 
 .lot__mark {
@@ -1841,7 +1874,7 @@ a {
 
 .lot__frames button.is-shot,
 .lot__dock button.is-shot {
-  border-color: #e10600;
+  border-color: rgba(225, 6, 0, 0.55);
   color: #e10600;
 }
 

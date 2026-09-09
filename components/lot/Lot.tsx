@@ -313,17 +313,19 @@ export function Lot({ onEnter, onScrap, shift, quiet = false, arrive }: LotProps
         <div ref={isoRef} className="lot__iso">
           <div className="lot__ground" aria-hidden />
           <div className="lot__halo" aria-hidden />
+          <div className="lot__boulevard" aria-hidden />
           <div className="lot__plaza" aria-hidden />
-          <div className="lot__ring" aria-hidden />
           {LOT_PATHS.map((path) => (
             <span
               key={`${path.x}-${path.y}`}
-              className="lot__spoke"
+              className="lot__street"
               style={{
                 width: path.length * CELL,
                 transform: `translate3d(${path.x * CELL}px, ${path.y * CELL}px, 0) translate(-50%, -50%) rotate(${path.angle}deg)`,
               }}
-            />
+            >
+              <i className="lot__street-lane" />
+            </span>
           ))}
           <span ref={markRef} className="lot__mark" aria-hidden />
           {LOT_LAMPS.map((lamp) => (
@@ -370,7 +372,7 @@ export function Lot({ onEnter, onScrap, shift, quiet = false, arrive }: LotProps
               <button
                 key={plot.id}
                 type="button"
-                className={`lot__plot kind-${plot.kind} ${hot === plot.id ? "is-hot" : ""} ${near?.id === plot.id ? "is-near" : ""} ${shot ? "is-shot" : "is-latent"}`}
+                className={`lot__plot kind-${plot.kind} ${hot === plot.id ? "is-hot" : ""} ${near?.id === plot.id ? "is-near" : ""} ${shot ? "is-read" : ""}`}
                 style={{
                   width,
                   height: depth,
@@ -381,6 +383,7 @@ export function Lot({ onEnter, onScrap, shift, quiet = false, arrive }: LotProps
                   ["--float-delay" as string]: `${index * 0.22}s`,
                 }}
                 onMouseEnter={() => setHot(plot.id)}
+                onMouseLeave={() => setHot((prev) => (prev === plot.id ? null : prev))}
                 onClick={() => pick(plot)}
                 aria-label={`Open ${plot.label}`}
               >

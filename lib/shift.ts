@@ -30,6 +30,7 @@ export const EMPTY_SHIFT: ShiftState = {
 };
 
 const KEY = "dipuck-night-shift";
+const INTRO_KEY = "dipuck-intro-seen";
 
 export function loadShift(): ShiftState {
   if (typeof window === "undefined") return EMPTY_SHIFT;
@@ -51,6 +52,25 @@ export function loadShift(): ShiftState {
 export function saveShift(state: ShiftState) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(KEY, JSON.stringify(state));
+}
+
+/** Countdown intro runs once per browser. After that, land on the sphere. */
+export function hasSeenIntro() {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(INTRO_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function markIntroSeen() {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(INTRO_KEY, "1");
+  } catch {
+    /* ignore quota / private mode */
+  }
 }
 
 export function nightClosed(state: ShiftState) {

@@ -43,12 +43,18 @@ export const LOT_PLOTS: LotPlot[] = EXPERIENCE_SEATS.map((seat, index) => {
 
 export type LotPath = { x: number; y: number; length: number; angle: number };
 
-/** A spoke from the plaza to every company. */
+/** A street from the plaza curb to each company block. */
 export const LOT_PATHS: LotPath[] = LOT_PLOTS.map((plot) => {
-  const length = Math.hypot(plot.x, plot.y);
+  const full = Math.hypot(plot.x, plot.y) || 1;
+  const nx = plot.x / full;
+  const ny = plot.y / full;
+  const start = 2.35;
+  const end = full - 0.95;
+  const length = Math.max(1, end - start);
+  const mid = (start + end) / 2;
   return {
-    x: plot.x / 2,
-    y: plot.y / 2,
+    x: Number((nx * mid).toFixed(2)),
+    y: Number((ny * mid).toFixed(2)),
     length,
     angle: (Math.atan2(plot.y, plot.x) * 180) / Math.PI,
   };

@@ -10,7 +10,9 @@ import { seatById } from "@/lib/experience";
 import {
   beatForChapter,
   EMPTY_SHIFT,
+  hasSeenIntro,
   loadShift,
+  markIntroSeen,
   saveShift,
   type BeatId,
   type ShiftState,
@@ -33,22 +35,23 @@ function isChapter(mode: Mode): mode is ChapterId {
 }
 
 export function Experience() {
-  const [mode, setMode] = useState<Mode>("boot");
+  const [mode, setMode] = useState<Mode | null>(null);
   const [surface, setSurface] = useState<Surface>("sphere");
   const [exhibit, setExhibit] = useState<string | undefined>();
   const [seatId, setSeatId] = useState<string | undefined>();
   const [arrive, setArrive] = useState<string | undefined>();
   const [flash, setFlash] = useState(0);
   const [shift, setShift] = useState<ShiftState>(EMPTY_SHIFT);
-  const modeRef = useRef(mode);
-  modeRef.current = mode;
-  const chapter = isChapter(mode) ? mode : null;
+  const modeRef = useRef<Mode>("boot");
+  if (mode) modeRef.current = mode;
+  const chapter = mode && isChapter(mode) ? mode : null;
   const highlight = chapter ?? (mode === "scan" ? "bomb" : undefined);
   const seat = seatId ? seatById(seatId) : undefined;
   const overlay = Boolean(chapter) || mode === "scan" || mode === "seat";
 
   useEffect(() => {
     setShift(loadShift());
+    setMode(hasSeenIntro() ? "sphere" : "boot");
   }, []);
 
   useEffect(() => {
@@ -89,6 +92,11 @@ export function Experience() {
     if (next !== modeRef.current && modeRef.current !== "boot") setFlash((n) => n + 1);
     setMode(next);
   }
+
+  function finishBoot() {
+    markIntroSeen();
+    go("sphere");
+  }
   const goRef = useRef(go);
   goRef.current = go;
 
@@ -105,7 +113,7 @@ export function Experience() {
   }
 
   useEffect(() => {
-    if (mode === "boot") return;
+    if (!mode || mode === "boot") return;
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") goRef.current(surface);
       if (event.key === "1") goRef.current("about");
@@ -134,11 +142,21 @@ export function Experience() {
     }
   }
 
-  const showWorld = mode !== "boot";
+  const showWorld = mode !== null && mode !== "boot";
   const onSphere = surface === "sphere";
   const onStreet = surface === "street";
   const onRack = surface === "rack";
   const backLabel = onStreet ? "Back to the street" : onSphere ? "Back to the sphere" : onRack ? "Back to the rack" : "Back";
+
+  if (mode === null) {
+    return (
+      <div className="compose">
+        <div className="compose__grid" aria-hidden />
+        <div className="compose__grain" aria-hidden />
+        <div className="compose__scanlines" aria-hidden />
+      </div>
+    );
+  }
 
   return (
     <div className={`compose${overlay ? " is-held" : ""}`}>
@@ -213,7 +231,7 @@ export function Experience() {
         ) : null}
       </AnimatePresence>
 
-      <AnimatePresence>{mode === "boot" ? <Boot onDone={() => go("sphere")} /> : null}</AnimatePresence>
+      <AnimatePresence>{mode === "boot" ? <Boot onDone={finishBoot} /> : null}</AnimatePresence>
       <AnimatePresence>
         {chapter ? (
           <Chapter
