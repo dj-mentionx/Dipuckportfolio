@@ -298,7 +298,7 @@ export function Lot({ onEnter, onScrap, shift, quiet = false, arrive }: LotProps
   }, [toast]);
 
   function pick(plot: LotPlot) {
-    if (drag.current.moved > 28) return;
+    if (drag.current.moved > 36) return;
     setHot(plot.id);
     onEnter(plot.chapter, plot.exhibit);
   }
