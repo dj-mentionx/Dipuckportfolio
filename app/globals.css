@@ -1799,7 +1799,7 @@ a {
 }
 
 .rack {
-  --rack-r: min(38vw, 390px);
+  --rack-r: min(32vw, 300px);
   position: absolute;
   inset: 0;
   z-index: 5;
@@ -1846,8 +1846,19 @@ a {
   width: calc(var(--rack-r) * 2);
   height: calc(var(--rack-r) * 2);
   margin: calc(var(--rack-r) * -1);
-  border: 1px solid rgba(225, 6, 0, 0.2);
+  border: 1px solid rgba(225, 6, 0, 0.42);
   border-radius: 50%;
+  pointer-events: none;
+}
+
+.rack__fill {
+  position: absolute;
+  left: -22px;
+  top: -30px;
+  width: 44px;
+  height: 60px;
+  border: 1px solid rgba(225, 6, 0, 0.22);
+  background: rgba(12, 12, 16, 0.72);
   pointer-events: none;
 }
 

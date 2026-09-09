@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Portrait } from "@/components/compose/Portrait";
-import { matchesFilter, RACK_CELLS, RACK_PRINTS, RACK_RINGS, type RackFilter, type RackPrint } from "@/lib/rack";
+import { matchesFilter, RACK_CELLS, RACK_FILL, RACK_PRINTS, RACK_RINGS, type RackFilter, type RackPrint } from "@/lib/rack";
 
 type RackProps = {
   onEnter: (chapter: "about" | "work" | "bomb" | "contact", exhibit?: string) => void;
@@ -143,6 +143,14 @@ export function Rack({ onEnter, onLot, onClassic, quiet = false, visited = [] }:
               />
             );
           })}
+          {RACK_FILL.map((fill) => (
+            <span
+              key={fill.id}
+              className="rack__fill"
+              style={{ transform: `rotateY(${fill.yaw}deg) rotateX(${fill.pitch}deg) translateZ(var(--rack-r))` }}
+              aria-hidden
+            />
+          ))}
           {RACK_CELLS.map((cell) => (
             <span
               key={cell.id}

@@ -32,6 +32,17 @@ export const RACK_RINGS = {
   meridians: [0, 30, 60, 90, 120, 150],
   parallels: [-55, -28, 0, 28, 55],
 };
+export const RACK_FILL = Array.from({ length: 24 }, (_, index) => {
+  const y = 1 - ((index + 0.5) / 24) * 2;
+  const radius = Math.sqrt(Math.max(0, 1 - y * y));
+  const theta = Math.PI * (3 - Math.sqrt(5)) * index + 2.4;
+  return {
+    id: `fill-${index}`,
+    yaw: (Math.atan2(Math.cos(theta) * radius, Math.sin(theta) * radius) * 180) / Math.PI,
+    pitch: (Math.asin(Math.max(-1, Math.min(1, y))) * 180) / Math.PI,
+  };
+});
+
 export const RACK_CELLS = Array.from({ length: 20 }, (_, index) => {
   const y = 1 - (index / 19) * 2;
   const radius = Math.sqrt(Math.max(0, 1 - y * y));
