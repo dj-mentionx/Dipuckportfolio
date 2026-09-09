@@ -7,9 +7,10 @@ type ExperienceFloorProps = {
   opened: string[];
   quiet?: boolean;
   onOpen: (id: string) => void;
+  onStreet: () => void;
 };
 
-export function ExperienceFloor({ opened, quiet = false, onOpen }: ExperienceFloorProps) {
+export function ExperienceFloor({ opened, quiet = false, onOpen, onStreet }: ExperienceFloorProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const rigRef = useRef<HTMLDivElement>(null);
   const home = EXPERIENCE_ORBIT[0];
@@ -156,8 +157,6 @@ export function ExperienceFloor({ opened, quiet = false, onOpen }: ExperienceFlo
               <span className="xp__recto">
                 <em>{seat.index}</em>
                 <b>{seat.short}</b>
-                <small>{seat.role}</small>
-                <span>{seat.line}</span>
               </span>
             </button>
           ))}
@@ -165,25 +164,13 @@ export function ExperienceFloor({ opened, quiet = false, onOpen }: ExperienceFlo
       </div>
 
       <div className="xp__chrome">
-        <p className="xp__brand">
-          EXPERIENCE
-          <strong>11 SEATS</strong>
-        </p>
-        <p className="xp__now">
-          <small>
-            {current.index} / {current.place}
-          </small>
-          {current.short}
-        </p>
-        <p className="xp__line">{current.line}</p>
-        <p className="xp__meta">
-          {current.role}
-          <br />
-          {current.dates}
-        </p>
+        <p className="xp__now">{current.short}</p>
+        <button type="button" className="xp__enter" onClick={onStreet}>
+          Enter the street
+        </button>
       </div>
 
-      <p className="xp__hint">Drag the sphere · Click a seat</p>
+      <p className="xp__hint">Drag</p>
 
       <nav className="xp__strip" aria-label="Seats">
         {EXPERIENCE_ORBIT.map((seat) => (

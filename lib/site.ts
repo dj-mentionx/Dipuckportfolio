@@ -48,16 +48,15 @@ export const SITE = {
     available: "Available immediately.",
   },
   about: {
-    kicker: "LOCKUP 01 / ABOUT",
+    kicker: "ABOUT",
     title: "DIPUCK JONES",
     lines: [
-      "Demand generation. Berlin. B2B SaaS.",
-      "He builds engines that connect spend to pipeline — for people, and for the models that answer first.",
-      "Available immediately.",
+      "Demand generation. Berlin.",
+      "Available now.",
     ],
   },
   record: {
-    kicker: "LOCKUP 02 / RECORD",
+    kicker: "WORK",
     title: "THE RECORD",
     lines: [
       "Eleven seats. One through-line: acquisition that survives the sales handoff.",
@@ -65,7 +64,7 @@ export const SITE = {
     ],
   },
   product: {
-    kicker: "LOCKUP 03 / PRODUCT",
+    kicker: "MENTIONX",
     title: "MENTIONX",
     lines: [
       "An agent that asks the models the questions buyers already type.",
@@ -74,11 +73,10 @@ export const SITE = {
     ],
   },
   write: {
-    kicker: "LOCKUP 04 / WRITE",
+    kicker: "WRITE",
     title: "WRITE",
     lines: [
-      "Growth seats. AEO retainers. A MentionX audit.",
-      "Berlin. Same day if the brief is sharp.",
+      "Berlin. Write if the brief is sharp.",
     ],
   },
   seats: [

@@ -7,7 +7,6 @@ import { ExperienceFloor } from "@/components/experience/ExperienceFloor";
 import { SeatPanel } from "@/components/experience/SeatPanel";
 import type { ChapterId } from "@/lib/compose";
 import { seatById } from "@/lib/experience";
-import { RACK_PRINTS } from "@/lib/rack";
 import {
   beatForChapter,
   EMPTY_SHIFT,
@@ -19,12 +18,12 @@ import {
 import { Boot } from "./Boot";
 import { Chapter } from "./Chapter";
 import { Scan } from "./Scan";
-import { Ticker } from "./Ticker";
 
+const Lot = dynamic(() => import("@/components/lot/Lot").then((mod) => mod.Lot), { ssr: false });
 const Rack = dynamic(() => import("@/components/rack/Rack").then((mod) => mod.Rack), { ssr: false });
 const Field = dynamic(() => import("./Field").then((mod) => mod.Field), { ssr: false });
 
-type Surface = "rack" | "experience" | "field";
+type Surface = "sphere" | "street" | "rack" | "field";
 type Mode = "boot" | Surface | ChapterId | "scan" | "seat";
 
 const CHAPTER_MODES: ChapterId[] = ["about", "work", "bomb", "contact"];
@@ -33,27 +32,16 @@ function isChapter(mode: Mode): mode is ChapterId {
   return CHAPTER_MODES.includes(mode as ChapterId);
 }
 
-function useClock() {
-  const [now, setNow] = useState("--:--:--");
-  useEffect(() => {
-    const tick = () => setNow(new Date().toISOString().slice(11, 19));
-    tick();
-    const id = window.setInterval(tick, 1000);
-    return () => window.clearInterval(id);
-  }, []);
-  return now;
-}
-
 export function Experience() {
   const [mode, setMode] = useState<Mode>("boot");
-  const [surface, setSurface] = useState<Surface>("experience");
+  const [surface, setSurface] = useState<Surface>("sphere");
   const [exhibit, setExhibit] = useState<string | undefined>();
   const [seatId, setSeatId] = useState<string | undefined>();
+  const [arrive, setArrive] = useState<string | undefined>();
   const [flash, setFlash] = useState(0);
   const [shift, setShift] = useState<ShiftState>(EMPTY_SHIFT);
   const modeRef = useRef(mode);
   modeRef.current = mode;
-  const clock = useClock();
   const chapter = isChapter(mode) ? mode : null;
   const highlight = chapter ?? (mode === "scan" ? "bomb" : undefined);
   const seat = seatId ? seatById(seatId) : undefined;
@@ -93,7 +81,7 @@ export function Experience() {
   }
 
   function go(next: Mode) {
-    if (next === "experience" || next === "field" || next === "rack") setSurface(next);
+    if (next === "sphere" || next === "street" || next === "field" || next === "rack") setSurface(next);
     if (next === "about") markVisit("hq", "about");
     if (next === "work") markVisit(undefined, "work");
     if (next === "bomb") markVisit("mentionx");
@@ -111,12 +99,17 @@ export function Experience() {
     setMode("seat");
   }
 
+  function enterStreet(id?: string) {
+    setArrive(id);
+    go("street");
+  }
+
   useEffect(() => {
     if (mode === "boot") return;
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") goRef.current(surface);
       if (event.key === "1") goRef.current("about");
-      if (event.key === "2") goRef.current("experience");
+      if (event.key === "2") goRef.current("street");
       if (event.key === "3") goRef.current("bomb");
       if (event.key === "4") goRef.current("contact");
     }
@@ -126,11 +119,11 @@ export function Experience() {
 
   function onPick(id: string, nextExhibit?: string) {
     if (id === "work" && nextExhibit) {
-      openSeat(nextExhibit === "fresh" ? "zarget" : nextExhibit);
+      openSeat(nextExhibit);
       return;
     }
     if (id === "work") {
-      go("experience");
+      go("street");
       return;
     }
     if (id === "about" || id === "bomb" || id === "contact") {
@@ -142,9 +135,10 @@ export function Experience() {
   }
 
   const showWorld = mode !== "boot";
-  const onExperience = surface === "experience";
+  const onSphere = surface === "sphere";
+  const onStreet = surface === "street";
   const onRack = surface === "rack";
-  const backLabel = onRack ? "Back to the rack" : onExperience ? "Back to experience" : "Back to lockup";
+  const backLabel = onStreet ? "Back to the street" : onSphere ? "Back to the sphere" : onRack ? "Back to the rack" : "Back";
 
   return (
     <div className={`compose${overlay ? " is-held" : ""}`}>
@@ -154,26 +148,41 @@ export function Experience() {
 
       {showWorld ? (
         <>
+          {onSphere ? (
+            <ExperienceFloor
+              quiet={overlay}
+              opened={shift.visited}
+              onOpen={(id) => enterStreet(id)}
+              onStreet={() => enterStreet()}
+            />
+          ) : null}
+          {onStreet ? (
+            <Lot
+              quiet={overlay}
+              shift={shift}
+              arrive={arrive}
+              onEnter={(id, nextExhibit) => onPick(id, nextExhibit)}
+              onScrap={(id) =>
+                patchShift((prev) => (prev.scraps.includes(id) ? prev : { ...prev, scraps: [...prev.scraps, id] }))
+              }
+            />
+          ) : null}
           {onRack ? (
             <Rack
               quiet={overlay}
               visited={shift.visited}
               onEnter={(id, nextExhibit) => onPick(id, nextExhibit)}
-              onLot={() => go("experience")}
+              onLot={() => go("street")}
               onClassic={() => go("field")}
             />
           ) : null}
-          {onExperience ? (
-            <ExperienceFloor
-              quiet={overlay}
-              opened={shift.visited}
-              onOpen={(id) => (id === "mentionx" ? go("bomb") : openSeat(id))}
-            />
-          ) : null}
           {surface === "field" ? <Field highlight={highlight} onPick={onPick} /> : null}
-          <nav className="compose__nav" aria-label="Chapters">
-            <button type="button" className={onExperience && mode === "experience" ? "is-on" : ""} onClick={() => go("experience")}>
-              Experience
+          <nav className="compose__nav" aria-label="Worlds">
+            <button type="button" className={onSphere && mode === "sphere" ? "is-on" : ""} onClick={() => go("sphere")}>
+              Sphere
+            </button>
+            <button type="button" className={onStreet && mode === "street" ? "is-on" : ""} onClick={() => go("street")}>
+              Street
             </button>
             <button type="button" className={mode === "about" ? "is-on" : ""} onClick={() => go("about")}>
               About
@@ -191,29 +200,6 @@ export function Experience() {
               Lockup
             </button>
           </nav>
-          <div className="compose__hud compose__hud--tl">
-            {onExperience ? "EXPERIENCE" : onRack ? "THE RACK" : "DARKROOM"}
-            <strong>{onExperience ? "SEATS" : onRack ? "PRINTS" : "EXPOSE"}</strong>
-          </div>
-          <div className="compose__hud compose__hud--tr">
-            UTC
-            <strong>{clock}</strong>
-          </div>
-          <div className="compose__hud compose__hud--bl">
-            DIPUCK JONES
-            <strong>GROWTH / AEO</strong>
-          </div>
-          <div className="compose__hud compose__hud--br">
-            {onExperience ? "OPENED" : onRack ? "PRINTS" : "BERLIN"}
-            <strong>
-              {onExperience
-                ? `${shift.visited.filter((id) => seatById(id)).length}/11`
-                : onRack
-                  ? `${shift.visited.filter((id) => RACK_PRINTS.some((print) => print.id === id)).length}/${RACK_PRINTS.length}`
-                  : "AVAILABLE"}
-            </strong>
-          </div>
-          <Ticker />
         </>
       ) : null}
 
@@ -229,7 +215,7 @@ export function Experience() {
         ) : null}
       </AnimatePresence>
 
-      <AnimatePresence>{mode === "boot" ? <Boot onDone={() => go("experience")} /> : null}</AnimatePresence>
+      <AnimatePresence>{mode === "boot" ? <Boot onDone={() => go("sphere")} /> : null}</AnimatePresence>
       <AnimatePresence>
         {chapter ? (
           <Chapter

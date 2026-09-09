@@ -3,21 +3,20 @@
 import { useEffect, useRef, useState } from "react";
 import { Portrait } from "@/components/compose/Portrait";
 import { LOT_LAMPS, LOT_PLOTS, type LotPlot } from "@/lib/lot";
-import { LOT_SCRAPS, SHIFT_BEATS, type BeatId, type ShiftState } from "@/lib/shift";
+import { LOT_SCRAPS, type ShiftState } from "@/lib/shift";
 
 type LotProps = {
   onEnter: (chapter: "about" | "work" | "bomb" | "contact", exhibit?: string) => void;
-  onClassic: () => void;
   onScrap: (id: string) => void;
-  onReset: () => void;
   shift: ShiftState;
   quiet?: boolean;
+  arrive?: string;
 };
 
 const CELL = 54;
 const PLAYABLE = LOT_PLOTS.filter((plot) => plot.chapter);
 const SPEED = 3.35;
-const LIMIT = 5.45;
+const LIMIT = 5.8;
 
 function collide(x: number, y: number) {
   let nx = x;
@@ -54,7 +53,7 @@ function nearestPlot(x: number, y: number) {
   return best;
 }
 
-export function Lot({ onEnter, onClassic, onScrap, onReset, shift, quiet = false }: LotProps) {
+export function Lot({ onEnter, onScrap, shift, quiet = false, arrive }: LotProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const rigRef = useRef<HTMLDivElement>(null);
   const isoRef = useRef<HTMLDivElement>(null);
@@ -75,9 +74,8 @@ export function Lot({ onEnter, onClassic, onScrap, onReset, shift, quiet = false
   onScrapRef.current = onScrap;
   const onEnterRef = useRef(onEnter);
   onEnterRef.current = onEnter;
-  const [hot, setHot] = useState<string | null>("hq");
+  const [hot, setHot] = useState<string | null>(arrive || "hq");
   const [near, setNear] = useState<LotPlot | null>(null);
-  const [hint, setHint] = useState(() => shift.visited.length === 0);
   const [toast, setToast] = useState<string | null>(null);
   const develop = Math.min(1, shift.visited.length / PLAYABLE.length);
 
@@ -124,6 +122,17 @@ export function Lot({ onEnter, onClassic, onScrap, onReset, shift, quiet = false
   }
 
   useEffect(() => {
+    if (!arrive) return;
+    const plot = LOT_PLOTS.find((item) => item.id === arrive);
+    if (!plot) return;
+    pos.current = { x: plot.x, y: plot.y + Math.min(1.2, plot.d) };
+    dest.current = null;
+    setHot(plot.id);
+    paint();
+    paintWalker();
+  }, [arrive]);
+
+  useEffect(() => {
     const wrap = wrapRef.current;
     if (!wrap) return;
     paint();
@@ -152,7 +161,6 @@ export function Lot({ onEnter, onClassic, onScrap, onReset, shift, quiet = false
         if (plot?.chapter) {
           event.preventDefault();
           setHot(plot.id);
-          setHint(false);
           onEnterRef.current(plot.chapter, plot.exhibit);
         }
       }
@@ -192,7 +200,6 @@ export function Lot({ onEnter, onClassic, onScrap, onReset, shift, quiet = false
       const cell = screenToCell(event.clientX, event.clientY);
       if (!cell) return;
       dest.current = collide(cell.x, cell.y);
-      setHint(false);
     };
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
@@ -296,16 +303,13 @@ export function Lot({ onEnter, onClassic, onScrap, onReset, shift, quiet = false
     if (drag.current.moved > 14) return;
     if (!plot.chapter) return;
     setHot(plot.id);
-    setHint(false);
     onEnter(plot.chapter, plot.exhibit);
   }
-
-  const closed = SHIFT_BEATS.every((beat) => shift.beats[beat.id as BeatId]);
 
   return (
     <div
       ref={wrapRef}
-      className={`lot ${quiet ? "is-quiet" : ""} ${closed ? "is-closed" : ""}`}
+      className={`lot ${quiet ? "is-quiet" : ""}`}
       style={{ ["--develop" as string]: String(develop) }}
     >
       <div ref={rigRef} className="lot__rig">
@@ -332,7 +336,7 @@ export function Lot({ onEnter, onClassic, onScrap, onReset, shift, quiet = false
                 onClick={() => {
                   grabbing.current.add(scrap.id);
                   onScrap(scrap.id);
-                  setToast(`${scrap.label} · ON THE SHEET`);
+                  setToast(scrap.label);
                 }}
                 aria-label={`Pick up ${scrap.label}`}
               >
@@ -372,10 +376,7 @@ export function Lot({ onEnter, onClassic, onScrap, onReset, shift, quiet = false
                   {plot.kind === "hq" ? <Portrait className="lot__print" /> : null}
                 </span>
                 {plot.label ? (
-                  <span className="lot__tag">
-                    <small>{shot ? plot.kicker : "UNDEVELOPED"}</small>
-                    {plot.label}
-                  </span>
+                  <span className="lot__tag">{plot.label}</span>
                 ) : null}
               </button>
             );
@@ -390,84 +391,11 @@ export function Lot({ onEnter, onClassic, onScrap, onReset, shift, quiet = false
         </div>
       </div>
 
-      <div className="lot__chrome">
-        <p className="lot__brand">
-          THE LOT
-          <strong>NIGHT SHIFT</strong>
-        </p>
-        <div className="lot__controls">
-          <span>WASD / arrows · walk</span>
-          <span>Tap ground · go there</span>
-          <span>E · enter</span>
-          <span>Drag · orbit</span>
-        </div>
-        <button type="button" className="lot__ui lot__classic" onClick={onClassic}>
-          Classic lockup
-        </button>
-      </div>
-
-      <aside className="lot__sheet" aria-label="Call sheet">
-        <p className="lot__sheet-kicker">CALL SHEET · SHIFT 01</p>
-        <ul>
-          {SHIFT_BEATS.map((beat) => (
-            <li key={beat.id} className={shift.beats[beat.id] ? "is-done" : ""}>
-              <span />
-              {beat.label}
-              <small>{beat.hint}</small>
-            </li>
-          ))}
-        </ul>
-        <p className="lot__sheet-kicker">FRAMES {shift.visited.length}/{PLAYABLE.length}</p>
-        <div className="lot__frames">
-          {PLAYABLE.map((plot) => (
-            <button
-              key={plot.id}
-              type="button"
-              className={shift.visited.includes(plot.id) ? "is-shot" : ""}
-              onClick={() => plot.chapter && onEnter(plot.chapter, plot.exhibit)}
-              title={plot.label}
-            >
-              {plot.label.slice(0, 2)}
-            </button>
-          ))}
-        </div>
-        <p className="lot__sheet-kicker">SCRAPS {shift.scraps.length}/{LOT_SCRAPS.length}</p>
-        <button type="button" className="lot__ui lot__ui--ghost" onClick={onReset}>
-          New shift
-        </button>
-      </aside>
-
-      {hint ? (
-        <aside className="lot__guide">
-          <Portrait className="lot__guide-face" />
-          <div>
-            <p className="lot__guide-kicker">SHIFT 01 · NIGHT WATCH</p>
-            <p>Walk the lot. Buildings develop when you enter. Close the sheet.</p>
-            <div className="lot__guide-row">
-              <button type="button" className="lot__ui" onClick={() => setHint(false)}>
-                Clock in
-              </button>
-              <button
-                type="button"
-                className="lot__ui lot__ui--ghost"
-                onClick={() => {
-                  setHint(false);
-                  onEnter("about");
-                }}
-              >
-                Skip to HQ
-              </button>
-            </div>
-          </div>
-          <button type="button" className="lot__guide-x" onClick={() => setHint(false)} aria-label="Dismiss">
-            ×
-          </button>
-        </aside>
-      ) : null}
+      <p className="lot__walk">WASD · E · drag</p>
 
       {near && !quiet ? (
         <p className="lot__prompt">
-          E · ENTER <strong>{near.label}</strong>
+          E · <strong>{near.label}</strong>
         </p>
       ) : null}
 
