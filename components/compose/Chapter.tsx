@@ -10,8 +10,10 @@ import { Scramble } from "./Scramble";
 
 type ChapterProps = {
   id: ChapterId;
+  exhibit?: string;
   onClose: () => void;
   onScan?: () => void;
+  backLabel?: string;
 };
 
 function KineticTitle({ text }: { text: string }) {
@@ -32,10 +34,10 @@ function KineticTitle({ text }: { text: string }) {
   );
 }
 
-export function Chapter({ id, onClose, onScan }: ChapterProps) {
+export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to the lot" }: ChapterProps) {
   const data = CHAPTERS[id];
   const [copied, setCopied] = useState(false);
-  const [open, setOpen] = useState<string | null>(EXHIBITS[0]?.id ?? null);
+  const [open, setOpen] = useState<string | null>(exhibit || EXHIBITS[0]?.id || null);
 
   async function copyMail() {
     await navigator.clipboard.writeText("rush2dipuck@gmail.com");
@@ -147,7 +149,7 @@ export function Chapter({ id, onClose, onScan }: ChapterProps) {
         ) : null}
 
         <button type="button" className="chapter__back" onClick={onClose}>
-          Back to field
+          {backLabel}
         </button>
       </motion.div>
     </motion.section>

@@ -8,9 +8,10 @@ import { Scramble } from "./Scramble";
 
 type ScanProps = {
   onClose: () => void;
+  backLabel?: string;
 };
 
-export function Scan({ onClose }: ScanProps) {
+export function Scan({ onClose, backLabel = "Back to the lot" }: ScanProps) {
   const [name, setName] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -124,7 +125,7 @@ export function Scan({ onClose }: ScanProps) {
           </motion.div>
         )}
         <button type="button" className="chapter__back" onClick={onClose}>
-          Back to field
+          {backLabel}
         </button>
       </div>
     </motion.section>
