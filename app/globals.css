@@ -1080,58 +1080,120 @@ a {
   position: absolute;
   left: 0;
   top: 0;
-  width: 1080px;
-  height: 1080px;
-  margin: -540px;
+  width: 1280px;
+  height: 1280px;
+  margin: -640px;
   background:
-    radial-gradient(ellipse at center, rgba(225, 6, 0, calc(0.16 + var(--develop, 0) * 0.28)), transparent 52%),
-    repeating-linear-gradient(0deg, rgba(244, 244, 240, 0.045) 0 1px, transparent 1px 54px),
-    repeating-linear-gradient(90deg, rgba(244, 244, 240, 0.045) 0 1px, transparent 1px 54px),
-    #0b0b0f;
+    radial-gradient(ellipse at center, rgba(225, 6, 0, calc(0.22 + var(--develop, 0) * 0.32)), transparent 46%),
+    repeating-linear-gradient(0deg, rgba(244, 244, 240, 0.04) 0 1px, transparent 1px 54px),
+    repeating-linear-gradient(90deg, rgba(244, 244, 240, 0.04) 0 1px, transparent 1px 54px),
+    #09090d;
   box-shadow:
-    0 0 0 2px rgba(225, 6, 0, 0.42),
-    0 0 0 18px rgba(5, 5, 7, 0.85);
+    0 0 0 2px rgba(225, 6, 0, 0.36),
+    0 0 0 28px rgba(5, 5, 7, 0.88);
   transform: translateZ(-2px);
+}
+
+.lot__halo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 420px;
+  height: 420px;
+  margin: -210px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(225, 6, 0, 0.28), transparent 68%);
+  transform: translateZ(1px);
+  pointer-events: none;
+  filter: blur(2px);
 }
 
 .lot__plaza {
   position: absolute;
   left: 0;
   top: 0;
-  width: 168px;
-  height: 168px;
-  margin: -84px;
-  border: 1px solid rgba(225, 6, 0, 0.4);
-  background: radial-gradient(circle, rgba(225, 6, 0, 0.12), transparent 70%);
+  width: 220px;
+  height: 220px;
+  margin: -110px;
+  border-radius: 50%;
+  border: 1px solid rgba(225, 6, 0, 0.55);
+  background:
+    radial-gradient(circle, rgba(225, 6, 0, 0.22), transparent 72%),
+    repeating-conic-gradient(from 0deg, rgba(244, 244, 240, 0.05) 0 8deg, transparent 8deg 16deg);
+  box-shadow: 0 0 48px rgba(225, 6, 0, 0.22);
+  transform: translateZ(2px);
+  pointer-events: none;
+}
+
+.lot__ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 640px;
+  height: 640px;
+  margin: -320px;
+  border-radius: 50%;
+  border: 1px dashed rgba(225, 6, 0, 0.22);
   transform: translateZ(1px);
   pointer-events: none;
 }
 
-.lot__road {
+.lot__spoke {
   position: absolute;
   left: 0;
   top: 0;
+  height: 16px;
   background:
-    linear-gradient(90deg, transparent 46%, rgba(225, 6, 0, 0.55) 46% 54%, transparent 54%),
-    #14141a;
-  transform: translate(-50%, -50%) translateZ(1px);
+    repeating-linear-gradient(90deg, rgba(244, 244, 240, 0.28) 0 14px, transparent 14px 28px) 50% 50% / 100% 2px no-repeat,
+    linear-gradient(90deg, transparent, rgba(225, 6, 0, 0.18), transparent),
+    #121218;
+  transform-origin: center;
+  pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(225, 6, 0, 0.12);
+}
+
+.lot__hero {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 108px;
+  height: 108px;
+  margin: -54px;
+  padding: 0;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transform: translateZ(56px) rotateZ(calc(var(--yaw) * -1)) rotateX(-58deg);
+  animation: hero-bob 2.4s ease-in-out infinite;
+  z-index: 8;
+}
+
+.lot__hero-glow {
+  position: absolute;
+  inset: -18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(225, 6, 0, 0.45), transparent 70%);
   pointer-events: none;
 }
 
-.lot__road--h {
-  width: 980px;
-  height: 34px;
-  background:
-    repeating-linear-gradient(90deg, rgba(244, 244, 240, 0.35) 0 18px, transparent 18px 36px) 50% 50% / 100% 2px no-repeat,
-    #14141a;
+.lot__hero-print,
+.lot__hero-print.portrait {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px #e10600,
+    0 0 28px rgba(225, 6, 0, 0.65);
 }
 
-.lot__road--v {
-  width: 34px;
-  height: 980px;
-  background:
-    repeating-linear-gradient(180deg, rgba(244, 244, 240, 0.35) 0 18px, transparent 18px 36px) 50% 50% / 2px 100% no-repeat,
-    #14141a;
+@keyframes hero-bob {
+  0%, 100% { transform: translateZ(56px) rotateZ(calc(var(--yaw) * -1)) rotateX(-58deg) translateY(0); }
+  50% { transform: translateZ(56px) rotateZ(calc(var(--yaw) * -1)) rotateX(-58deg) translateY(-16px); }
 }
 
 .lot__lamp {
@@ -1186,6 +1248,13 @@ a {
   transform-style: preserve-3d;
   transform-origin: center center;
   overflow: visible;
+  animation: plot-bob 4.2s ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+@keyframes plot-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -7px; }
 }
 
 .lot__plot:disabled {
@@ -1201,8 +1270,10 @@ a {
 
 .lot__face--top {
   inset: 0;
-  background: #16161c;
-  box-shadow: inset 0 0 0 1px rgba(244, 244, 240, 0.08);
+  background:
+    linear-gradient(135deg, rgba(225, 6, 0, 0.16), transparent 42%),
+    #16161c;
+  box-shadow: inset 0 0 0 1px rgba(244, 244, 240, 0.1);
   transform: translateZ(var(--bh));
   overflow: hidden;
 }
@@ -1313,28 +1384,48 @@ a {
   top: 0;
   z-index: 2;
   display: grid;
-  gap: 2px;
-  min-width: 92px;
-  padding: 8px 10px;
-  background: rgba(5, 5, 7, 0.88);
-  border: 1px solid rgba(225, 6, 0, 0.45);
+  gap: 5px;
+  min-width: 176px;
+  max-width: 220px;
+  padding: 12px 14px 13px;
+  background: rgba(5, 5, 7, 0.92);
+  border: 1px solid rgba(225, 6, 0, 0.55);
   color: #f4f4f0;
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 13px;
+  font-size: 17px;
   font-weight: 800;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.045em;
   line-height: 1;
-  white-space: nowrap;
   pointer-events: none;
-  transform: translate(-50%, -100%) translateZ(calc(var(--bh) + 18px)) rotateZ(calc(var(--yaw) * -1)) rotateX(-58deg);
+  transform: translate(-50%, -108%) translateZ(calc(var(--bh) + 22px)) rotateZ(calc(var(--yaw) * -1)) rotateX(-58deg);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  animation: tag-bob 3.6s ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
 }
 
 .lot__tag small {
   font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   color: #e10600;
+}
+
+.lot__tag em {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: rgba(244, 244, 240, 0.62);
+  white-space: normal;
+}
+
+@keyframes tag-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -9px; }
 }
 
 .lot__walk {
@@ -1643,20 +1734,15 @@ a {
 
 .lot__walker-head {
   position: absolute;
-  left: -4px;
-  top: -4px;
-  width: 30px;
-  height: 30px;
+  left: 2px;
+  top: 2px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  overflow: hidden;
+  background: #e10600;
   transform: translateZ(42px) rotateZ(calc(var(--yaw) * -1)) rotateX(-58deg);
-  box-shadow: 0 0 0 1px #e10600, 0 0 18px rgba(225, 6, 0, 0.8);
+  box-shadow: 0 0 0 1px #e10600, 0 0 16px rgba(225, 6, 0, 0.85);
   animation: walker-bob 0.9s ease-in-out infinite;
-}
-
-.lot__walker-head .portrait {
-  width: 100%;
-  height: 100%;
 }
 
 .lot__sheet {
@@ -2317,7 +2403,7 @@ a {
 }
 
 .xp.xp--sphere {
-  --xp-r: min(34vw, 300px);
+  --xp-r: min(36vw, 320px);
   position: absolute;
   inset: 0;
   z-index: 2;
@@ -2327,6 +2413,10 @@ a {
   cursor: grab;
   touch-action: none;
   user-select: none;
+}
+
+.xp.xp--skills {
+  --xp-r: min(38vw, 348px);
 }
 
 .xp.xp--sphere:active {
@@ -2359,12 +2449,12 @@ a {
 
 .xp__core {
   position: absolute;
-  width: 18px;
-  height: 18px;
-  margin: -9px;
+  width: 22px;
+  height: 22px;
+  margin: -11px;
   border-radius: 50%;
   background: #e10600;
-  box-shadow: 0 0 70px 26px rgba(225, 6, 0, 0.4);
+  box-shadow: 0 0 90px 34px rgba(225, 6, 0, 0.42);
 }
 
 .xp__ring {
@@ -2393,6 +2483,79 @@ a {
   color: #f4f4f0;
   cursor: pointer;
   transform-style: preserve-3d;
+}
+
+.xp__chip {
+  --face: 0.45;
+  position: absolute;
+  left: -58px;
+  top: -18px;
+  width: 116px;
+  height: 36px;
+  padding: 0;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #f4f4f0;
+  cursor: pointer;
+  transform-style: preserve-3d;
+}
+
+.xp__chip.is-feature {
+  left: -80px;
+  top: -28px;
+  width: 160px;
+  height: 56px;
+}
+
+.xp__chip.is-echo {
+  left: -46px;
+  top: -13px;
+  width: 92px;
+  height: 26px;
+}
+
+.xp__chip-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 0 10px;
+  border: 1px solid rgba(244, 244, 240, 0.14);
+  background:
+    linear-gradient(180deg, rgba(225, 6, 0, calc(0.08 + var(--face) * 0.38)), #0c0c10 70%);
+  backface-visibility: hidden;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  text-align: center;
+  white-space: nowrap;
+  opacity: calc(0.28 + var(--face) * 0.72);
+}
+
+.xp__chip.is-feature .xp__chip-face {
+  font-size: 15px;
+  letter-spacing: -0.045em;
+  border-color: rgba(225, 6, 0, 0.72);
+  white-space: normal;
+}
+
+.xp__chip.is-echo .xp__chip-face {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: calc(0.16 + var(--face) * 0.5);
+}
+
+.xp__chip.is-hot .xp__chip-face {
+  border-color: #e10600;
+  box-shadow: 0 0 24px rgba(225, 6, 0, 0.45);
+  opacity: 1;
 }
 
 .xp__recto {
@@ -2637,6 +2800,27 @@ a {
   line-height: 1.5;
 }
 
+.seat__figure {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: baseline;
+  margin: 22px 0 0;
+}
+
+.seat__figure strong {
+  font-size: 18px;
+  letter-spacing: -0.04em;
+}
+
+.seat__figure span {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 244, 240, 0.45);
+}
+
 .seat__did {
   display: grid;
   gap: 14px;
@@ -2845,8 +3029,9 @@ a {
 }
 
 @media (max-width: 980px) {
-  .xp.xp--sphere {
-    --xp-r: min(42vw, 220px);
+  .xp.xp--sphere,
+  .xp.xp--skills {
+    --xp-r: min(44vw, 236px);
   }
 
   .xp__card {
@@ -2854,6 +3039,28 @@ a {
     top: -72px;
     width: 108px;
     height: 144px;
+  }
+
+  .xp__chip.is-feature {
+    left: -64px;
+    top: -22px;
+    width: 128px;
+    height: 44px;
+  }
+
+  .xp__chip.is-feature .xp__chip-face {
+    font-size: 13px;
+  }
+
+  .lot__tag {
+    min-width: 148px;
+    font-size: 14px;
+  }
+
+  .lot__hero {
+    width: 86px;
+    height: 86px;
+    margin: -43px;
   }
 
   .xp__chrome {
@@ -2890,7 +3097,11 @@ a {
   .lot__lamp::after,
   .lot__scrap-dot,
   .lot__walker-head,
-  .xp__card {
+  .lot__hero,
+  .lot__plot,
+  .lot__tag,
+  .xp__card,
+  .xp__chip {
     animation: none;
   }
 }

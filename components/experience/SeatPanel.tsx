@@ -11,8 +11,6 @@ type SeatPanelProps = {
 };
 
 export function SeatPanel({ seat, onClose, onMention, backLabel = "Back" }: SeatPanelProps) {
-  const did = seat.did.slice(0, 3);
-
   return (
     <motion.section className="seat" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
       <motion.div className="seat__bar" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }} />
@@ -23,13 +21,20 @@ export function SeatPanel({ seat, onClose, onMention, backLabel = "Back" }: Seat
         exit={{ y: 12, opacity: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
-        <h2>{seat.short}</h2>
+        <p className="seat__kicker">{seat.place}</p>
+        <h2>{seat.org}</h2>
         <p className="seat__role">
           {seat.role}
           <span>{seat.dates}</span>
         </p>
+        <p className="seat__line">{seat.line}</p>
+        <p className="seat__note">{seat.note}</p>
+        <p className="seat__figure">
+          <strong>{seat.figure}</strong>
+          <span>{seat.figureLabel}</span>
+        </p>
         <ol className="seat__did">
-          {did.map((item, index) => (
+          {seat.did.map((item, index) => (
             <motion.li
               key={item}
               initial={{ x: 16, opacity: 0 }}
@@ -41,6 +46,11 @@ export function SeatPanel({ seat, onClose, onMention, backLabel = "Back" }: Seat
             </motion.li>
           ))}
         </ol>
+        <ul className="seat__ch">
+          {seat.channels.map((channel) => (
+            <li key={channel}>{channel}</li>
+          ))}
+        </ul>
         <div className="seat__row">
           {seat.kind === "product" && onMention ? (
             <button type="button" className="chapter__cta" onClick={onMention}>

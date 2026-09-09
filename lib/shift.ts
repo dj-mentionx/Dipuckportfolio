@@ -15,11 +15,11 @@ export const SHIFT_BEATS: { id: BeatId; label: string; hint: string }[] = [
 ];
 
 export const LOT_SCRAPS = [
-  { id: "13y", label: "13Y", x: 1.35, y: -1.15 },
-  { id: "250", label: "$250K", x: -2.15, y: -1.85 },
-  { id: "aeo", label: "AEO", x: 2.55, y: -2.35 },
-  { id: "40m", label: "₹40M", x: -1.75, y: 2.15 },
-  { id: "now", label: "NOW", x: 4.15, y: -0.85 },
+  { id: "13y", label: "13Y", x: 2.1, y: 2.4 },
+  { id: "250", label: "$250K", x: -3.2, y: 1.8 },
+  { id: "aeo", label: "AEO", x: 3.4, y: -2.1 },
+  { id: "40m", label: "₹40M", x: -2.4, y: -3.1 },
+  { id: "now", label: "NOW", x: 0.8, y: 3.6 },
 ];
 
 export const EMPTY_SHIFT: ShiftState = {

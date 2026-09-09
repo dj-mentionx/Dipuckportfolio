@@ -1,25 +1,36 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { EXPERIENCE_ORBIT, EXPERIENCE_RINGS, type OrbitSeat } from "@/lib/experience";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { SKILL_CHIPS, SKILLS, type Skill, type SkillChip } from "@/lib/skills";
 
 type ExperienceFloorProps = {
-  opened: string[];
   quiet?: boolean;
-  onOpen: (id: string) => void;
   onStreet: () => void;
 };
 
-export function ExperienceFloor({ opened, quiet = false, onOpen, onStreet }: ExperienceFloorProps) {
+type PlacedChip = SkillChip & { yaw: number; pitch: number; radius: number };
+
+function place(chip: SkillChip): PlacedChip {
+  const radius = Math.hypot(chip.x, chip.y, chip.z) || 1;
+  return {
+    ...chip,
+    radius,
+    yaw: (Math.atan2(chip.x, chip.z) * 180) / Math.PI,
+    pitch: (-Math.asin(chip.y / radius) * 180) / Math.PI,
+  };
+}
+
+export function ExperienceFloor({ quiet = false, onStreet }: ExperienceFloorProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const rigRef = useRef<HTMLDivElement>(null);
-  const home = EXPERIENCE_ORBIT[0];
-  const ang = useRef({ yaw: home ? -home.yaw : 0, pitch: 8, vy: 0.02, vp: 0 });
+  const chips = useMemo(() => SKILL_CHIPS.map(place), []);
+  const featured = useMemo(() => chips.filter((chip) => chip.featured), [chips]);
+  const ang = useRef({ yaw: 18, pitch: 12, vy: 0.085, vp: 0 });
   const drag = useRef({ on: false, lx: 0, ly: 0, moved: 0 });
   const look = useRef<{ yaw: number; pitch: number } | null>(null);
   const quietRef = useRef(quiet);
   quietRef.current = quiet;
-  const [hot, setHot] = useState(home?.id ?? "mentionx");
+  const [hot, setHot] = useState(SKILLS[0].id);
   const reducedRef = useRef(false);
 
   function paint() {
@@ -27,10 +38,15 @@ export function ExperienceFloor({ opened, quiet = false, onOpen, onStreet }: Exp
     if (!rig) return;
     const { yaw, pitch } = ang.current;
     rig.style.transform = `rotateX(${pitch}deg) rotateY(${yaw}deg)`;
+    rig.style.setProperty("--yaw", `${yaw}deg`);
+    rig.style.setProperty("--pitch", `${pitch}deg`);
     rig.querySelectorAll<HTMLElement>("[data-yaw]").forEach((node) => {
       const py = Number(node.dataset.yaw);
       const pp = Number(node.dataset.pitch);
-      const face = Math.max(0, Math.cos(((yaw + py) * Math.PI) / 180) * Math.cos(((pitch + pp) * Math.PI) / 180));
+      const face = Math.max(
+        0,
+        Math.cos(((yaw + py) * Math.PI) / 180) * Math.cos(((pitch + pp) * Math.PI) / 180),
+      );
       node.style.setProperty("--face", face.toFixed(3));
     });
   }
@@ -55,9 +71,9 @@ export function ExperienceFloor({ opened, quiet = false, onOpen, onStreet }: Exp
       drag.current.moved += Math.abs(dx) + Math.abs(dy);
       drag.current.lx = event.clientX;
       drag.current.ly = event.clientY;
-      ang.current.yaw += dx * 0.38;
-      ang.current.pitch = Math.max(-38, Math.min(38, ang.current.pitch - dy * 0.28));
-      ang.current.vy = dx * 0.16;
+      ang.current.yaw += dx * 0.42;
+      ang.current.pitch = Math.max(-42, Math.min(42, ang.current.pitch - dy * 0.3));
+      ang.current.vy = dx * 0.18;
       ang.current.vp = -dy * 0.1;
       paint();
     };
@@ -67,8 +83,8 @@ export function ExperienceFloor({ opened, quiet = false, onOpen, onStreet }: Exp
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
       look.current = null;
-      ang.current.yaw += event.deltaX * 0.08;
-      ang.current.pitch = Math.max(-38, Math.min(38, ang.current.pitch - event.deltaY * 0.04));
+      ang.current.yaw += event.deltaX * 0.1;
+      ang.current.pitch = Math.max(-42, Math.min(42, ang.current.pitch - event.deltaY * 0.05));
       paint();
     };
 
@@ -84,9 +100,9 @@ export function ExperienceFloor({ opened, quiet = false, onOpen, onStreet }: Exp
         return;
       }
       if (drag.current.on || reducedRef.current) return;
-      const idle = Math.abs(ang.current.vy) < 0.02 && Math.abs(ang.current.vp) < 0.02;
-      ang.current.yaw += idle ? 0.018 : ang.current.vy;
-      ang.current.pitch = Math.max(-38, Math.min(38, ang.current.pitch + ang.current.vp));
+      const idle = Math.abs(ang.current.vy) < 0.03 && Math.abs(ang.current.vp) < 0.03;
+      ang.current.yaw += idle ? 0.055 : ang.current.vy;
+      ang.current.pitch = Math.max(-42, Math.min(42, ang.current.pitch + ang.current.vp));
       ang.current.vy *= 0.94;
       ang.current.vp *= 0.9;
       paint();
@@ -108,28 +124,27 @@ export function ExperienceFloor({ opened, quiet = false, onOpen, onStreet }: Exp
     };
   }, []);
 
-  function face(seat: OrbitSeat) {
-    look.current = { yaw: -seat.yaw, pitch: Math.max(-22, Math.min(22, -seat.pitch * 0.35)) };
-    setHot(seat.id);
+  function face(chip: PlacedChip) {
+    look.current = { yaw: -chip.yaw, pitch: Math.max(-22, Math.min(22, -chip.pitch * 0.4)) };
+    setHot(chip.skillId);
   }
 
-  function pick(seat: OrbitSeat) {
+  function pick(chip: PlacedChip) {
     if (drag.current.moved > 12) return;
-    face(seat);
-    onOpen(seat.id);
+    face(chip);
   }
 
-  const current = EXPERIENCE_ORBIT.find((seat) => seat.id === hot) ?? EXPERIENCE_ORBIT[0];
+  const current: Skill = SKILLS.find((skill) => skill.id === hot) ?? SKILLS[0];
 
   return (
-    <div ref={wrapRef} className={`xp xp--sphere${quiet ? " is-quiet" : ""}`}>
+    <div ref={wrapRef} className={`xp xp--sphere xp--skills${quiet ? " is-quiet" : ""}`}>
       <div className="xp__stage">
         <div ref={rigRef} className="xp__rig">
           <div className="xp__core" aria-hidden />
-          {EXPERIENCE_RINGS.meridians.map((deg) => (
+          {[0, 30, 60, 90, 120, 150].map((deg) => (
             <i key={`m-${deg}`} className="xp__ring xp__ring--meridian" style={{ transform: `rotateY(${deg}deg)` }} />
           ))}
-          {EXPERIENCE_RINGS.parallels.map((deg) => {
+          {[-48, -24, 0, 24, 48].map((deg) => {
             const rad = (deg * Math.PI) / 180;
             return (
               <i
@@ -141,49 +156,49 @@ export function ExperienceFloor({ opened, quiet = false, onOpen, onStreet }: Exp
               />
             );
           })}
-          {EXPERIENCE_ORBIT.map((seat) => (
+          {chips.map((chip) => (
             <button
-              key={seat.id}
+              key={chip.id}
               type="button"
-              data-yaw={seat.yaw}
-              data-pitch={seat.pitch}
-              className={`xp__card${seat.featured ? " is-feature" : ""}${hot === seat.id ? " is-hot" : ""}${opened.includes(seat.id) ? " is-read" : ""}`}
-              style={{ transform: `rotateY(${seat.yaw}deg) rotateX(${seat.pitch}deg) translateZ(var(--xp-r))` }}
-              onMouseEnter={() => setHot(seat.id)}
-              onFocus={() => setHot(seat.id)}
-              onClick={() => pick(seat)}
-              aria-label={`Open ${seat.short}`}
+              data-yaw={chip.yaw}
+              data-pitch={chip.pitch}
+              className={`xp__chip${chip.featured ? " is-feature" : " is-echo"}${hot === chip.skillId ? " is-hot" : ""}`}
+              style={{
+                transform: `rotateY(${chip.yaw}deg) rotateX(${chip.pitch}deg) translateZ(calc(var(--xp-r) * ${chip.radius}))`,
+              }}
+              onMouseEnter={() => setHot(chip.skillId)}
+              onFocus={() => setHot(chip.skillId)}
+              onClick={() => pick(chip)}
+              aria-label={chip.name}
             >
-              <span className="xp__recto">
-                <em>{seat.index}</em>
-                <b>{seat.short}</b>
-              </span>
+              <span className="xp__chip-face">{chip.name}</span>
             </button>
           ))}
         </div>
       </div>
 
       <div className="xp__chrome">
-        <p className="xp__now">{current.short}</p>
+        <p className="xp__now">
+          <small>Skills</small>
+          {current.name}
+        </p>
+        <p className="xp__line">{current.blurb}</p>
         <button type="button" className="xp__enter" onClick={onStreet}>
           Enter the street
         </button>
       </div>
 
-      <p className="xp__hint">Drag</p>
+      <p className="xp__hint">Drag · spin</p>
 
-      <nav className="xp__strip" aria-label="Seats">
-        {EXPERIENCE_ORBIT.map((seat) => (
+      <nav className="xp__strip" aria-label="Skills">
+        {featured.map((chip) => (
           <button
-            key={seat.id}
+            key={chip.id}
             type="button"
-            className={`${hot === seat.id ? "is-on" : ""} ${opened.includes(seat.id) ? "is-read" : ""}`}
-            onClick={() => {
-              face(seat);
-              onOpen(seat.id);
-            }}
+            className={hot === chip.skillId ? "is-on" : ""}
+            onClick={() => face(chip)}
           >
-            {seat.short}
+            {chip.name}
           </button>
         ))}
       </nav>

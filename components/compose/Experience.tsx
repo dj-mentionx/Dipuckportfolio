@@ -151,8 +151,6 @@ export function Experience() {
           {onSphere ? (
             <ExperienceFloor
               quiet={overlay}
-              opened={shift.visited}
-              onOpen={(id) => enterStreet(id)}
               onStreet={() => enterStreet()}
             />
           ) : null}
