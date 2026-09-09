@@ -85,9 +85,9 @@ export function topoPositions(radius: number, dense: boolean) {
       const draw = (t: number) => {
         const lng = (t / steps) * 360 - 180;
         const n =
-          Math.sin(lng * 0.045 + lat0 * 0.08) * 4.2 +
-          Math.sin(lng * 0.13 + b * 1.7) * 2.1 +
-          Math.sin(lng * 0.31 + lat0 * 0.2) * 1.1;
+          Math.sin(lng * 0.045 + lat0 * 0.08) * 1.6 +
+          Math.sin(lng * 0.13 + b * 1.7) * 0.8 +
+          Math.sin(lng * 0.31 + lat0 * 0.2) * 0.4;
         if (hash(b * 50 + Math.floor(lng / 18)) < 0.18) return null;
         return latLngToVector(lat0 + n, lng, radius + n * 0.0018);
       };

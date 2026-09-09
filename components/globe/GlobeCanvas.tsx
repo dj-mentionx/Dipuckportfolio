@@ -61,14 +61,14 @@ const BODY = {
     varying vec3 vV;
     uniform float uTime;
     void main() {
-      float f = pow(1.0 - abs(dot(vN, vV)), 2.6);
-      float scan = 0.04 * sin(vN.y * 28.0 + uTime * 0.7);
-      vec3 ink = vec3(0.035, 0.032, 0.03);
-      vec3 rim = vec3(1.0, 0.18, 0.1);
-      vec3 metal = vec3(0.22, 0.2, 0.18);
-      vec3 col = mix(ink, metal, f * 0.55);
-      col = mix(col, rim, f * 0.72 + scan);
-      gl_FragColor = vec4(col, 0.94);
+      float f = pow(1.0 - abs(dot(vN, vV)), 2.05);
+      float scan = 0.05 * sin(vN.y * 22.0 + uTime * 0.55);
+      vec3 ink = vec3(0.09, 0.075, 0.07);
+      vec3 rim = vec3(1.0, 0.24, 0.14);
+      vec3 metal = vec3(0.38, 0.34, 0.3);
+      vec3 col = mix(ink, metal, f * 0.7);
+      col = mix(col, rim, f * 0.88 + scan);
+      gl_FragColor = vec4(col, 0.96);
     }
   `,
 };
@@ -92,9 +92,15 @@ function Body() {
   useEffect(() => () => mat.dispose(), [mat]);
 
   return (
-    <mesh material={mat}>
-      <sphereGeometry args={[0.98, 64, 64]} />
-    </mesh>
+    <group>
+      <mesh>
+        <sphereGeometry args={[0.965, 64, 64]} />
+        <meshBasicMaterial color="#171311" />
+      </mesh>
+      <mesh material={mat}>
+        <sphereGeometry args={[0.982, 64, 64]} />
+      </mesh>
+    </group>
   );
 }
 
@@ -162,7 +168,7 @@ function Topography({ dense }: { dense: boolean }) {
   const object = useMemo(() => {
     const geo = new BufferGeometry();
     geo.setAttribute("position", new BufferAttribute(topoPositions(1.002, dense), 3));
-    const mat = new LineBasicMaterial({ color: "#d8d2c8", transparent: true, opacity: 0.22 });
+    const mat = new LineBasicMaterial({ color: "#efe8de", transparent: true, opacity: 0.42 });
     return new LineSegments(geo, mat);
   }, [dense]);
 
@@ -180,9 +186,9 @@ function Topography({ dense }: { dense: boolean }) {
 function Rings() {
   const rings = useMemo(() => {
     const specs = [
-      { r: 1.34, x: 0.55, z: 0.12, c: "#ff2a1a", o: 0.38 },
-      { r: 1.52, x: -0.28, z: 0.4, c: "#f5f2ec", o: 0.16 },
-      { r: 1.72, x: 0.18, z: -0.52, c: "#ff2a1a", o: 0.18 },
+      { r: 1.16, x: 0.42, z: 0.1, c: "#ff2a1a", o: 0.5 },
+      { r: 1.28, x: -0.22, z: 0.28, c: "#f5f2ec", o: 0.22 },
+      { r: 1.4, x: 0.14, z: -0.34, c: "#ff2a1a", o: 0.22 },
     ];
     return specs.map((spec) => {
       const geo = new BufferGeometry();
@@ -295,11 +301,11 @@ function Halo() {
     <group>
       <mesh scale={1.08}>
         <sphereGeometry args={[1, 48, 48]} />
-        <meshBasicMaterial color="#ff2a1a" transparent opacity={0.07} side={BackSide} blending={AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color="#ff2a1a" transparent opacity={0.14} side={BackSide} blending={AdditiveBlending} depthWrite={false} />
       </mesh>
       <mesh scale={1.22}>
         <sphereGeometry args={[1, 32, 32]} />
-        <meshBasicMaterial color="#ff2a1a" transparent opacity={0.04} side={BackSide} blending={AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color="#ff2a1a" transparent opacity={0.08} side={BackSide} blending={AdditiveBlending} depthWrite={false} />
       </mesh>
       <mesh rotation={[Math.PI / 2.2, 0.2, 0.4]}>
         <ringGeometry args={[1.28, 1.31, 80]} />
@@ -345,11 +351,11 @@ function CameraRig({ dissolving, pointer }: { dissolving: boolean; pointer: Poin
   useFrame(({ camera, clock }) => {
     const intro = Math.min(1, clock.elapsedTime / 2.1);
     const eased = 1 - (1 - intro) ** 3;
-    const z = dissolving ? 1.55 : 3.6 - eased * 1.85;
-    camera.position.x += (0.18 + pointer.x * 0.16 - camera.position.x) * 0.05;
-    camera.position.y += (-0.08 + pointer.y * 0.1 - camera.position.y) * 0.05;
-    camera.position.z += (z - camera.position.z) * 0.055;
-    camera.lookAt(0.08, -0.04, 0);
+    const z = dissolving ? 2.15 : 3.15 - eased * 0.28;
+    camera.position.x += (0.06 + pointer.x * 0.07 - camera.position.x) * 0.06;
+    camera.position.y += (0.04 + pointer.y * 0.05 - camera.position.y) * 0.06;
+    camera.position.z += (z - camera.position.z) * 0.06;
+    camera.lookAt(0.2, 0, 0);
   });
   return null;
 }
@@ -402,13 +408,13 @@ function Scene({ rotation, focus, hover, dense, dissolving, pointer, onProject }
     <>
       <color attach="background" args={["#050505"]} />
       <CameraRig dissolving={dissolving} pointer={pointer} />
-      <PointCloud count={dense ? 900 : 380} radius={4.6} size={0.012} color="#f5f2ec" opacity={0.28} />
-      <Halo />
-      <group ref={group} position={[0.22, -0.12, 0]} scale={1.18}>
+      <PointCloud count={dense ? 700 : 280} radius={5.2} size={0.01} color="#f5f2ec" opacity={0.22} />
+      <group ref={group} position={[0.32, 0, 0]}>
+        <Halo />
         <Body />
         <Core />
         <Topography dense={dense} />
-        <PointCloud count={dense ? 2200 : 1100} radius={1.015} size={0.01} color="#f5f2ec" opacity={0.55} />
+        <PointCloud count={dense ? 1800 : 900} radius={1.02} size={0.014} color="#f5f2ec" opacity={0.7} />
         <Rings />
         <Routes radius={1} />
         <Courier radius={1} />
@@ -423,10 +429,10 @@ export function GlobeCanvas(props: SceneProps) {
   return (
     <Canvas
       dpr={[1, 1.5]}
-      gl={{ antialias: true, alpha: true, powerPreference: "high-performance", failIfMajorPerformanceCaveat: false }}
-      camera={{ position: [0.2, -0.06, 3.5], fov: 32 }}
+      gl={{ antialias: true, alpha: false, powerPreference: "high-performance", failIfMajorPerformanceCaveat: false }}
+      camera={{ position: [0.06, 0.04, 3.05], fov: 36 }}
       onCreated={({ gl }) => {
-        gl.setClearColor("#050505", 0);
+        gl.setClearColor("#050505", 1);
       }}
     >
       <Scene {...props} />
