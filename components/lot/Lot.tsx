@@ -382,6 +382,9 @@ export function Lot({ onEnter, onScrap, shift, quiet = false, arrive }: LotProps
                   ["--bd" as string]: `${depth}px`,
                   ["--float-delay" as string]: `${index * 0.22}s`,
                 }}
+                onPointerDown={() => {
+                  drag.current.moved = 0;
+                }}
                 onMouseEnter={() => setHot(plot.id)}
                 onMouseLeave={() => setHot((prev) => (prev === plot.id ? null : prev))}
                 onClick={() => pick(plot)}
