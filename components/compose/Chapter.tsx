@@ -6,8 +6,10 @@ import { CHAPTERS, type ChapterId } from "@/lib/compose";
 import { EXHIBITS } from "@/lib/exhibits";
 import { SITE } from "@/lib/site";
 import { CountUp } from "./CountUp";
+import { MentionStory } from "./MentionStory";
 import { Portrait } from "./Portrait";
 import { Scramble } from "./Scramble";
+import { WriteDesk } from "./WriteDesk";
 
 type ChapterProps = {
   id: ChapterId;
@@ -36,17 +38,9 @@ function KineticTitle({ text }: { text: string }) {
   );
 }
 
-export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to the lot", onSigned }: ChapterProps) {
+export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to experience", onSigned }: ChapterProps) {
   const data = CHAPTERS[id];
-  const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState<string | null>(exhibit || EXHIBITS[0]?.id || null);
-
-  async function copyMail() {
-    await navigator.clipboard.writeText(SITE.person.email);
-    setCopied(true);
-    onSigned?.();
-    window.setTimeout(() => setCopied(false), 1600);
-  }
 
   return (
     <motion.section className="chapter" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }}>
@@ -67,10 +61,14 @@ export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to the
         exit={{ x: "-8%", opacity: 0 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
       >
-        <p className="chapter__ghost" aria-hidden>
-          {id === "about" ? <CountUp to={SITE.person.years} /> : data.figure}
-        </p>
-        <p className="chapter__kicker">{data.kicker}</p>
+        {id === "bomb" ? null : (
+          <>
+            <p className="chapter__ghost" aria-hidden>
+              {id === "about" ? <CountUp to={SITE.person.years} /> : data.figure}
+            </p>
+            <p className="chapter__kicker">{data.kicker}</p>
+          </>
+        )}
         {id === "about" ? (
           <motion.div
             className="chapter__face"
@@ -91,28 +89,16 @@ export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to the
             <Portrait live />
           </motion.div>
         ) : null}
-        <KineticTitle text={data.title} />
-        {id === "bomb" && onScan ? (
-          <motion.button
-            type="button"
-            className="chapter__cta"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45 }}
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              onScan();
-            }}
-          >
-            Drop a name
-          </motion.button>
-        ) : null}
-        {data.lines.map((line, index) => (
-          <p key={line} className="chapter__copy">
-            <Scramble text={line} delay={420 + index * 160} />
-          </p>
-        ))}
+        {id === "bomb" ? null : <KineticTitle text={data.title} />}
+        {id === "bomb" ? (
+          <MentionStory onScan={onScan} onClose={onClose} backLabel={backLabel} />
+        ) : (
+          data.lines.map((line, index) => (
+            <p key={line} className="chapter__copy">
+              <Scramble text={line} delay={420 + index * 160} />
+            </p>
+          ))
+        )}
 
         {id === "work" ? (
           <div className="reel">
@@ -139,21 +125,13 @@ export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to the
           </div>
         ) : null}
 
-        {id === "contact" ? (
-          <motion.div className="chapter__links" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}>
-            <button type="button" className="chapter__mail" onClick={copyMail}>
-              {SITE.person.email}
-              <span>{copied ? "copied" : "copy"}</span>
-            </button>
-            <a href={SITE.person.linkedin} target="_blank" rel="noreferrer">
-              {SITE.person.linkedinLabel}
-            </a>
-          </motion.div>
-        ) : null}
+        {id === "contact" ? <WriteDesk onSigned={onSigned} /> : null}
 
-        <button type="button" className="chapter__back" onClick={onClose}>
-          {backLabel}
-        </button>
+        {id === "bomb" ? null : (
+          <button type="button" className="chapter__back" onClick={onClose}>
+            {backLabel}
+          </button>
+        )}
       </motion.div>
     </motion.section>
   );

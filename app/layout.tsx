@@ -27,12 +27,12 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Dipuck Jones — THE LOT",
+    default: "Dipuck Jones — Experience",
     template: "%s — Dipuck Jones",
   },
-  description: "A darkroom rack of prints you can rotate. 13 years of B2B SaaS growth, MentionX, Berlin.",
+  description: "Eleven seats. MentionX. Berlin. Click a block and open the work.",
   openGraph: {
-    title: "Dipuck Jones — THE LOT",
+    title: "Dipuck Jones — Experience",
     description: POSITIONING.argument,
     url: SITE_URL,
     siteName: PERSON.name,
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dipuck Jones — THE LOT",
+    title: "Dipuck Jones — Experience",
     description: POSITIONING.argument,
   },
 };

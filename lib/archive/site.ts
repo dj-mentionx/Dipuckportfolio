@@ -31,7 +31,7 @@ export const POSITIONING = {
 } as const;
 
 export const NAV = [
-  { href: "/", label: "Lot" },
+  { href: "/", label: "Experience" },
   { href: "/about", label: "About" },
   { href: "/work", label: "Work" },
   { href: "/mentionx", label: "MentionX" },
@@ -40,7 +40,7 @@ export const NAV = [
 ] as const;
 
 export const FOOTER_LINKS = [
-  { href: "/", label: "Lot" },
+  { href: "/", label: "Experience" },
   { href: "/about", label: "About" },
   { href: "/work", label: "Work" },
   { href: "/mentionx", label: "MentionX" },

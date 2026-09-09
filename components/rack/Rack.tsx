@@ -77,7 +77,7 @@ export function Rack({ onEnter, onLot, onClassic, quiet = false, visited = [] }:
     let raf = 0;
     const tick = () => {
       raf = window.requestAnimationFrame(tick);
-      if (quietRef.current) return;
+      if (quietRef.current || document.hidden) return;
       if (look.current) {
         ang.current.yaw += (look.current.yaw - ang.current.yaw) * 0.08;
         ang.current.pitch += (look.current.pitch - ang.current.pitch) * 0.08;
@@ -86,10 +86,12 @@ export function Rack({ onEnter, onLot, onClassic, quiet = false, visited = [] }:
         return;
       }
       if (drag.current.on || reducedRef.current) return;
-      ang.current.yaw += ang.current.vy + 0.035;
+      const coasting = Math.abs(ang.current.vy) > 0.02 || Math.abs(ang.current.vp) > 0.02;
+      if (!coasting) return;
+      ang.current.yaw += ang.current.vy;
       ang.current.pitch = Math.max(-42, Math.min(42, ang.current.pitch + ang.current.vp));
-      ang.current.vy *= 0.94;
-      ang.current.vp *= 0.9;
+      ang.current.vy *= 0.92;
+      ang.current.vp *= 0.88;
       paint();
     };
     raf = window.requestAnimationFrame(tick);
@@ -220,7 +222,7 @@ export function Rack({ onEnter, onLot, onClassic, quiet = false, visited = [] }:
         </div>
         <div className="rack__row">
           <button type="button" className="lot__ui lot__ui--ghost" onClick={onLot}>
-            Enter the lot
+            Enter experience
           </button>
           <button type="button" className="lot__ui lot__ui--ghost" onClick={onClassic}>
             Classic lockup

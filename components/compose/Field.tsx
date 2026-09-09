@@ -119,6 +119,10 @@ export function Field({ highlight, onPick }: FieldProps) {
     wrap.addEventListener("pointerdown", onDown);
 
     const tick = (time: number) => {
+      if (document.hidden) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
       const w = wrap.clientWidth;
       const h = wrap.clientHeight;
       const mx = mouse.current.x * w;

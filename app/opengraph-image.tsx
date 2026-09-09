@@ -20,7 +20,7 @@ export default function OpenGraphImage() {
         }}
       >
         <div style={{ display: "flex", fontSize: 20, letterSpacing: 6, color: "#FF2A1A" }}>
-          DIPUCK JONES — THE LOT
+          DIPUCK JONES — EXPERIENCE
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 72, lineHeight: 0.95, letterSpacing: -2 }}>

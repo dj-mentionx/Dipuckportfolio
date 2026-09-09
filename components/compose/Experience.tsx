@@ -1,28 +1,31 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Lot } from "@/components/lot/Lot";
-import { Rack } from "@/components/rack/Rack";
+import { ExperienceFloor } from "@/components/experience/ExperienceFloor";
+import { SeatPanel } from "@/components/experience/SeatPanel";
 import type { ChapterId } from "@/lib/compose";
+import { seatById } from "@/lib/experience";
 import { RACK_PRINTS } from "@/lib/rack";
 import {
   beatForChapter,
   EMPTY_SHIFT,
   loadShift,
-  nightClosed,
   saveShift,
   type BeatId,
   type ShiftState,
 } from "@/lib/shift";
 import { Boot } from "./Boot";
 import { Chapter } from "./Chapter";
-import { Field } from "./Field";
 import { Scan } from "./Scan";
 import { Ticker } from "./Ticker";
 
-type Surface = "rack" | "lot" | "field";
-type Mode = "boot" | Surface | ChapterId | "scan";
+const Rack = dynamic(() => import("@/components/rack/Rack").then((mod) => mod.Rack), { ssr: false });
+const Field = dynamic(() => import("./Field").then((mod) => mod.Field), { ssr: false });
+
+type Surface = "rack" | "experience" | "field";
+type Mode = "boot" | Surface | ChapterId | "scan" | "seat";
 
 const CHAPTER_MODES: ChapterId[] = ["about", "work", "bomb", "contact"];
 
@@ -43,16 +46,18 @@ function useClock() {
 
 export function Experience() {
   const [mode, setMode] = useState<Mode>("boot");
-  const [surface, setSurface] = useState<Surface>("rack");
+  const [surface, setSurface] = useState<Surface>("experience");
   const [exhibit, setExhibit] = useState<string | undefined>();
+  const [seatId, setSeatId] = useState<string | undefined>();
   const [flash, setFlash] = useState(0);
   const [shift, setShift] = useState<ShiftState>(EMPTY_SHIFT);
-  const [stamp, setStamp] = useState(false);
   const modeRef = useRef(mode);
   modeRef.current = mode;
   const clock = useClock();
   const chapter = isChapter(mode) ? mode : null;
   const highlight = chapter ?? (mode === "scan" ? "bomb" : undefined);
+  const seat = seatId ? seatById(seatId) : undefined;
+  const overlay = Boolean(chapter) || mode === "scan" || mode === "seat";
 
   useEffect(() => {
     setShift(loadShift());
@@ -66,7 +71,6 @@ export function Experience() {
   function patchShift(next: (prev: ShiftState) => ShiftState) {
     setShift((prev) => {
       const updated = next(prev);
-      if (!nightClosed(prev) && nightClosed(updated) && !updated.closedAck) setStamp(true);
       saveShift(updated);
       return updated;
     });
@@ -89,10 +93,10 @@ export function Experience() {
   }
 
   function go(next: Mode) {
-    if (next === "lot" || next === "field" || next === "rack") setSurface(next);
+    if (next === "experience" || next === "field" || next === "rack") setSurface(next);
     if (next === "about") markVisit("hq", "about");
     if (next === "work") markVisit(undefined, "work");
-    if (next === "bomb") markVisit("mx");
+    if (next === "bomb") markVisit("mentionx");
     if (next === "contact") markVisit("write", "contact");
     if (next !== modeRef.current && modeRef.current !== "boot") setFlash((n) => n + 1);
     setMode(next);
@@ -100,12 +104,19 @@ export function Experience() {
   const goRef = useRef(go);
   goRef.current = go;
 
+  function openSeat(id: string) {
+    setSeatId(id);
+    markVisit(id, "work");
+    if (modeRef.current !== "boot") setFlash((n) => n + 1);
+    setMode("seat");
+  }
+
   useEffect(() => {
     if (mode === "boot") return;
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") goRef.current(surface);
       if (event.key === "1") goRef.current("about");
-      if (event.key === "2") goRef.current("work");
+      if (event.key === "2") goRef.current("experience");
       if (event.key === "3") goRef.current("bomb");
       if (event.key === "4") goRef.current("contact");
     }
@@ -114,32 +125,29 @@ export function Experience() {
   }, [mode, surface]);
 
   function onPick(id: string, nextExhibit?: string) {
-    if (id === "about" || id === "work" || id === "bomb" || id === "contact") {
+    if (id === "work" && nextExhibit) {
+      openSeat(nextExhibit === "fresh" ? "zarget" : nextExhibit);
+      return;
+    }
+    if (id === "work") {
+      go("experience");
+      return;
+    }
+    if (id === "about" || id === "bomb" || id === "contact") {
       setExhibit(nextExhibit);
-      const plotId =
-        nextExhibit === "zarget"
-          ? "fresh"
-          : nextExhibit === "thinkproject"
-            ? "think"
-            : id === "about"
-              ? "hq"
-              : id === "bomb"
-                ? "mx"
-                : id === "contact"
-                  ? "write"
-                  : nextExhibit;
+      const plotId = id === "about" ? "hq" : id === "bomb" ? "mentionx" : "write";
       markVisit(plotId, id);
       go(id);
     }
   }
 
   const showWorld = mode !== "boot";
-  const onLot = surface === "lot";
+  const onExperience = surface === "experience";
   const onRack = surface === "rack";
-  const backLabel = onRack ? "Back to the rack" : onLot ? "Back to the lot" : "Back to lockup";
+  const backLabel = onRack ? "Back to the rack" : onExperience ? "Back to experience" : "Back to lockup";
 
   return (
-    <div className="compose">
+    <div className={`compose${overlay ? " is-held" : ""}`}>
       <div className="compose__grid" aria-hidden />
       <div className="compose__grain" aria-hidden />
       <div className="compose__scanlines" aria-hidden />
@@ -148,49 +156,27 @@ export function Experience() {
         <>
           {onRack ? (
             <Rack
-              quiet={Boolean(chapter) || mode === "scan"}
+              quiet={overlay}
               visited={shift.visited}
               onEnter={(id, nextExhibit) => onPick(id, nextExhibit)}
-              onLot={() => go("lot")}
+              onLot={() => go("experience")}
               onClassic={() => go("field")}
             />
           ) : null}
-          {onLot ? (
-            <Lot
-              quiet={Boolean(chapter) || mode === "scan"}
-              shift={shift}
-              onEnter={(id, nextExhibit) => onPick(id, nextExhibit)}
-              onClassic={() => go("field")}
-              onScrap={(id) =>
-                patchShift((prev) => (prev.scraps.includes(id) ? prev : { ...prev, scraps: [...prev.scraps, id] }))
-              }
-              onReset={() => {
-                saveShift(EMPTY_SHIFT);
-                setShift(EMPTY_SHIFT);
-                setStamp(false);
-              }}
+          {onExperience ? (
+            <ExperienceFloor
+              quiet={overlay}
+              opened={shift.visited}
+              onOpen={(id) => (id === "mentionx" ? go("bomb") : openSeat(id))}
             />
           ) : null}
           {surface === "field" ? <Field highlight={highlight} onPick={onPick} /> : null}
           <nav className="compose__nav" aria-label="Chapters">
-            <button type="button" className={onRack && mode === "rack" ? "is-on" : ""} onClick={() => go("rack")}>
-              Rack
-            </button>
-            <button type="button" className={onLot && mode === "lot" ? "is-on" : ""} onClick={() => go("lot")}>
-              Lot
+            <button type="button" className={onExperience && mode === "experience" ? "is-on" : ""} onClick={() => go("experience")}>
+              Experience
             </button>
             <button type="button" className={mode === "about" ? "is-on" : ""} onClick={() => go("about")}>
               About
-            </button>
-            <button
-              type="button"
-              className={mode === "work" ? "is-on" : ""}
-              onClick={() => {
-                setExhibit(undefined);
-                go("work");
-              }}
-            >
-              Work
             </button>
             <button type="button" className={mode === "bomb" || mode === "scan" ? "is-on" : ""} onClick={() => go("bomb")}>
               MentionX
@@ -198,13 +184,16 @@ export function Experience() {
             <button type="button" className={mode === "contact" ? "is-on" : ""} onClick={() => go("contact")}>
               Contact
             </button>
+            <button type="button" className={onRack && mode === "rack" ? "is-on" : ""} onClick={() => go("rack")}>
+              Rack
+            </button>
             <button type="button" className={surface === "field" && mode === "field" ? "is-on" : ""} onClick={() => go("field")}>
               Lockup
             </button>
           </nav>
           <div className="compose__hud compose__hud--tl">
-            {onRack ? "THE RACK" : onLot ? "THE LOT" : "DARKROOM"}
-            <strong>{onRack ? "PRINTS" : onLot ? "BERLIN" : "EXPOSE"}</strong>
+            {onExperience ? "EXPERIENCE" : onRack ? "THE RACK" : "DARKROOM"}
+            <strong>{onExperience ? "SEATS" : onRack ? "PRINTS" : "EXPOSE"}</strong>
           </div>
           <div className="compose__hud compose__hud--tr">
             UTC
@@ -215,12 +204,10 @@ export function Experience() {
             <strong>GROWTH / AEO</strong>
           </div>
           <div className="compose__hud compose__hud--br">
-            {onLot ? (nightClosed(shift) ? "NIGHT" : "FRAMES") : onRack ? "PRINTS" : "BERLIN"}
+            {onExperience ? "OPENED" : onRack ? "PRINTS" : "BERLIN"}
             <strong>
-              {onLot
-                ? nightClosed(shift)
-                  ? "CLOSED"
-                  : `${shift.visited.length}/9`
+              {onExperience
+                ? `${shift.visited.filter((id) => seatById(id)).length}/11`
                 : onRack
                   ? `${shift.visited.filter((id) => RACK_PRINTS.some((print) => print.id === id)).length}/${RACK_PRINTS.length}`
                   : "AVAILABLE"}
@@ -242,31 +229,7 @@ export function Experience() {
         ) : null}
       </AnimatePresence>
 
-      <AnimatePresence>{mode === "boot" ? <Boot onDone={() => go("rack")} /> : null}</AnimatePresence>
-      <AnimatePresence>
-        {stamp && onLot && mode === "lot" ? (
-          <motion.div
-            className="shift__stamp"
-            initial={{ opacity: 0, scale: 1.12 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <p>NIGHT CLOSED</p>
-            <strong>THE PRINT IS READY</strong>
-            <span>13 years on the contact sheet. Available.</span>
-            <button
-              type="button"
-              className="lot__ui"
-              onClick={() => {
-                setStamp(false);
-                patchShift((prev) => ({ ...prev, closedAck: true }));
-              }}
-            >
-              Keep walking
-            </button>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      <AnimatePresence>{mode === "boot" ? <Boot onDone={() => go("experience")} /> : null}</AnimatePresence>
       <AnimatePresence>
         {chapter ? (
           <Chapter
@@ -281,12 +244,19 @@ export function Experience() {
         ) : null}
       </AnimatePresence>
       <AnimatePresence>
-        {mode === "scan" ? (
-          <Scan
+        {mode === "seat" && seat ? (
+          <SeatPanel
+            key={seat.id}
+            seat={seat}
             onClose={() => go(surface)}
             backLabel={backLabel}
-            onLock={() => markBeat("name")}
+            onMention={seat.kind === "product" ? () => go("bomb") : undefined}
           />
+        ) : null}
+      </AnimatePresence>
+      <AnimatePresence>
+        {mode === "scan" ? (
+          <Scan onClose={() => go(surface)} backLabel={backLabel} onLock={() => markBeat("name")} />
         ) : null}
       </AnimatePresence>
     </div>
