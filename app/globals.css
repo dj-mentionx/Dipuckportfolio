@@ -1068,7 +1068,7 @@ a {
   height: 1080px;
   margin: -540px;
   background:
-    radial-gradient(ellipse at center, rgba(225, 6, 0, 0.16), transparent 52%),
+    radial-gradient(ellipse at center, rgba(225, 6, 0, calc(0.16 + var(--develop, 0) * 0.28)), transparent 52%),
     repeating-linear-gradient(0deg, rgba(244, 244, 240, 0.045) 0 1px, transparent 1px 54px),
     repeating-linear-gradient(90deg, rgba(244, 244, 240, 0.045) 0 1px, transparent 1px 54px),
     #0b0b0f;
@@ -1483,8 +1483,294 @@ a {
 
 .lot.is-quiet .lot__chrome,
 .lot.is-quiet .lot__guide,
-.lot.is-quiet .lot__dock {
+.lot.is-quiet .lot__dock,
+.lot.is-quiet .lot__sheet,
+.lot.is-quiet .lot__prompt,
+.lot.is-quiet .lot__toast {
   display: none;
+}
+
+.lot.is-closed .lot__lamp::after {
+  box-shadow: 0 0 34px 14px rgba(225, 6, 0, 0.8);
+}
+
+.lot.is-closed .lot__plaza {
+  box-shadow: 0 0 0 2px #e10600, 0 0 40px rgba(225, 6, 0, 0.35);
+}
+
+.lot__plot.is-latent:not(.kind-filler) .lot__face--south,
+.lot__plot.is-latent:not(.kind-filler) .lot__face--east {
+  background: #0e0e14;
+}
+
+.lot__plot.is-latent .lot__tag {
+  opacity: 0.42;
+  border-style: dashed;
+}
+
+.lot__plot.is-shot.kind-work .lot__face--south,
+.lot__plot.is-shot.kind-work .lot__face--east,
+.lot__plot.is-shot.kind-hq .lot__face--south {
+  box-shadow: inset 0 0 24px rgba(225, 6, 0, 0.28);
+}
+
+.lot__plot.is-near .lot__face--top {
+  box-shadow:
+    inset 0 0 0 2px #e10600,
+    0 0 36px rgba(225, 6, 0, 0.55);
+}
+
+.lot__mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  margin: -14px;
+  border: 1px solid #e10600;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateZ(2px);
+  box-shadow: 0 0 16px rgba(225, 6, 0, 0.45);
+}
+
+.lot__scrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  appearance: none;
+  border: 1px solid #e10600;
+  background: rgba(5, 5, 7, 0.9);
+  color: #e10600;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 6px 7px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transform-origin: center bottom;
+  animation: scrap-bob 2.2s ease-in-out infinite;
+}
+
+.lot__walker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 22px;
+  margin: -11px;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  z-index: 6;
+}
+
+.lot__walker-shadow {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  transform: translateZ(2px) scale(1.35, 0.7);
+}
+
+.lot__walker-body {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  width: 7px;
+  height: 38px;
+  background: linear-gradient(#e10600, #3a0505);
+  transform-origin: center top;
+  transform: rotateX(90deg);
+  box-shadow: 0 0 12px rgba(225, 6, 0, 0.65);
+}
+
+.lot__walker-head {
+  position: absolute;
+  left: -4px;
+  top: -4px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  overflow: hidden;
+  transform: translateZ(42px) rotateZ(calc(var(--yaw) * -1)) rotateX(-58deg);
+  box-shadow: 0 0 0 1px #e10600, 0 0 18px rgba(225, 6, 0, 0.8);
+  animation: walker-bob 0.9s ease-in-out infinite;
+}
+
+.lot__walker-head .portrait {
+  width: 100%;
+  height: 100%;
+}
+
+.lot__sheet {
+  position: absolute;
+  z-index: 19;
+  top: 72px;
+  right: 22px;
+  width: min(240px, calc(100vw - 40px));
+  padding: 14px 14px 12px;
+  border: 1px solid rgba(225, 6, 0, 0.35);
+  background: rgba(5, 5, 7, 0.82);
+  backdrop-filter: blur(16px);
+  pointer-events: auto;
+}
+
+.lot__sheet-kicker {
+  margin: 0 0 8px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(244, 244, 240, 0.42);
+}
+
+.lot__sheet ul {
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 7px;
+}
+
+.lot__sheet li {
+  display: grid;
+  grid-template-columns: 10px 1fr;
+  gap: 0 8px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(244, 244, 240, 0.5);
+}
+
+.lot__sheet li span {
+  width: 8px;
+  height: 8px;
+  margin-top: 2px;
+  border: 1px solid #e10600;
+  grid-row: 1 / 3;
+}
+
+.lot__sheet li small {
+  grid-column: 2;
+  color: rgba(244, 244, 240, 0.28);
+  font-size: 8px;
+}
+
+.lot__sheet li.is-done {
+  color: #e10600;
+}
+
+.lot__sheet li.is-done span {
+  background: #e10600;
+}
+
+.lot__frames {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 4px;
+  margin: 0 0 12px;
+}
+
+.lot__frames button {
+  appearance: none;
+  height: 28px;
+  border: 1px solid rgba(244, 244, 240, 0.16);
+  background: transparent;
+  color: rgba(244, 244, 240, 0.35);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.lot__frames button.is-shot,
+.lot__dock button.is-shot {
+  border-color: #e10600;
+  color: #e10600;
+}
+
+.lot__prompt {
+  position: absolute;
+  z-index: 19;
+  left: 50%;
+  bottom: 118px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 10px 16px;
+  border: 1px solid #e10600;
+  background: rgba(5, 5, 7, 0.88);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #f4f4f0;
+  pointer-events: none;
+}
+
+.lot__prompt strong {
+  color: #e10600;
+}
+
+.lot__toast {
+  position: absolute;
+  z-index: 22;
+  left: 50%;
+  top: 22%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 12px 18px;
+  background: #e10600;
+  color: #050507;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.shift__stamp {
+  position: absolute;
+  inset: 0;
+  z-index: 28;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  background: rgba(5, 5, 7, 0.55);
+  text-align: center;
+}
+
+.shift__stamp p {
+  margin: 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  color: #e10600;
+}
+
+.shift__stamp strong {
+  font-size: clamp(36px, 7vw, 84px);
+  font-weight: 800;
+  letter-spacing: -0.07em;
+  line-height: 0.9;
+}
+
+.shift__stamp span {
+  max-width: 360px;
+  color: rgba(244, 244, 240, 0.7);
+}
+
+@keyframes scrap-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -8px; }
+}
+
+@keyframes walker-bob {
+  0%, 100% { transform: translateZ(42px) rotateZ(calc(var(--yaw) * -1)) rotateX(-58deg) translateY(0); }
+  50% { transform: translateZ(42px) rotateZ(calc(var(--yaw) * -1)) rotateX(-58deg) translateY(-3px); }
 }
 
 @keyframes lamp-pulse {
@@ -1555,6 +1841,37 @@ a {
     font-size: 11px;
     padding: 6px 8px;
   }
+
+  .lot__sheet {
+    top: auto;
+    right: 12px;
+    left: 12px;
+    bottom: 148px;
+    width: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .lot__sheet ul,
+  .lot__sheet .lot__ui {
+    display: none;
+  }
+
+  .lot__sheet-kicker {
+    margin: 0;
+  }
+
+  .lot__frames {
+    margin: 0;
+    flex: 1;
+  }
+
+  .lot__prompt {
+    bottom: 200px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1567,7 +1884,9 @@ a {
   .portrait__scan,
   .field__face,
   .boot__face,
-  .lot__lamp::after {
+  .lot__lamp::after,
+  .lot__scrap,
+  .lot__walker-head {
     animation: none;
   }
 }

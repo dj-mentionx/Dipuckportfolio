@@ -459,7 +459,7 @@ export function Field({ highlight, onPick }: FieldProps) {
           {node.label}
         </button>
       ))}
-      <p className="field__hint">Hold the light · words burn in · Lot is in the nav</p>
+      <p className="field__hint">Hold the light · words burn in · Lot is the night shift</p>
     </div>
   );
 }

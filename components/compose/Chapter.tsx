@@ -14,6 +14,7 @@ type ChapterProps = {
   onClose: () => void;
   onScan?: () => void;
   backLabel?: string;
+  onSigned?: () => void;
 };
 
 function KineticTitle({ text }: { text: string }) {
@@ -34,7 +35,7 @@ function KineticTitle({ text }: { text: string }) {
   );
 }
 
-export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to the lot" }: ChapterProps) {
+export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to the lot", onSigned }: ChapterProps) {
   const data = CHAPTERS[id];
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState<string | null>(exhibit || EXHIBITS[0]?.id || null);
@@ -42,6 +43,7 @@ export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to the
   async function copyMail() {
     await navigator.clipboard.writeText("rush2dipuck@gmail.com");
     setCopied(true);
+    onSigned?.();
     window.setTimeout(() => setCopied(false), 1600);
   }
 

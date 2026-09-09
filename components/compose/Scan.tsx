@@ -9,9 +9,10 @@ import { Scramble } from "./Scramble";
 type ScanProps = {
   onClose: () => void;
   backLabel?: string;
+  onLock?: () => void;
 };
 
-export function Scan({ onClose, backLabel = "Back to the lot" }: ScanProps) {
+export function Scan({ onClose, backLabel = "Back to the lot", onLock }: ScanProps) {
   const [name, setName] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -38,6 +39,7 @@ export function Scan({ onClose, backLabel = "Back to the lot" }: ScanProps) {
         return;
       }
       setResult(data);
+      onLock?.();
     } catch {
       setError("No lock.");
     } finally {
