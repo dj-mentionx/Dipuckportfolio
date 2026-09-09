@@ -1,10 +1,15 @@
 :root {
-  --ink: #050507;
-  --paper: #f4f4f0;
-  --mute: rgba(244, 244, 240, 0.55);
-  --red: #e10600;
-  --red-rgb: 225, 6, 0;
+  --ink: #080808;
+  --paper: #f5f2ec;
+  --mute: rgba(245, 242, 236, 0.58);
+  --dim: rgba(245, 242, 236, 0.34);
+  --line: rgba(245, 242, 236, 0.1);
+  --panel: #111111;
+  --charcoal: #161616;
+  --metal: #8a8680;
+  --red: #ff2a1a;
+  --red-rgb: 255, 42, 26;
   --font-sans: "Syne", system-ui, sans-serif;
-  --font-display: var(--font-sans);
+  --font-display: "Instrument Serif", "Times New Roman", serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }

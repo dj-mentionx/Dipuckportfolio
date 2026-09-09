@@ -14,19 +14,22 @@ export default function OpenGraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          backgroundColor: "#050507",
-          color: "#F4F4F0",
+          backgroundColor: "#080808",
+          color: "#F5F2EC",
           padding: 64,
         }}
       >
-        <div style={{ display: "flex", fontSize: 20, letterSpacing: 8, color: "#E10600" }}>COMPOSE · LIVE LOCKUP</div>
+        <div style={{ display: "flex", fontSize: 20, letterSpacing: 6, color: "#FF2A1A" }}>
+          DIPUCK JONES // SIGNAL ARCHIVE
+        </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 84, lineHeight: 0.9, fontWeight: 800, letterSpacing: -3 }}>DIPUCK JONES</div>
-          <div style={{ marginTop: 18, fontSize: 28, color: "rgba(244,244,240,0.7)" }}>
-            Conduct the field. The type follows.
+          <div style={{ fontSize: 72, lineHeight: 0.95, letterSpacing: -2 }}>
+            I find the signal inside broken growth systems.
           </div>
         </div>
-        <div style={{ display: "flex", fontSize: 20, letterSpacing: 4, color: "#E10600" }}>ABOUT · WORK · MENTIONX · CONTACT</div>
+        <div style={{ display: "flex", fontSize: 20, letterSpacing: 4, color: "#FF2A1A" }}>
+          BERLIN · GROWTH SYSTEMS · MENTIONX
+        </div>
       </div>
     ),
     size,
