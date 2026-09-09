@@ -19,7 +19,7 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://dipuckjones.com"),
   title: "Dipuck Jones — THE LOT",
-  description: "Berlin after hours. Walk the career lot. Develop the print. 13 years of B2B SaaS growth, MentionX.",
+  description: "A darkroom rack of prints you can rotate. 13 years of B2B SaaS growth, MentionX, Berlin.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
