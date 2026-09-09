@@ -1629,16 +1629,13 @@ body.is-home .archive {
   }
 
   .field-home__copy {
-    top: 14vh;
-    max-width: 20ch;
+    top: 12vh;
+    max-width: 18ch;
   }
 
-  .field-home__copy--right {
-    left: 4vw;
-    right: auto;
-    top: auto;
-    bottom: 34vh;
-    text-align: left;
+  .field-home__copy--right,
+  .field-home__copy--left .kicker {
+    display: none;
   }
 
   .field-home__copy h1,
