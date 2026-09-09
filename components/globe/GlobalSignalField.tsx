@@ -97,9 +97,14 @@ export function GlobalSignalField() {
       const behind = mark.z > 0.92;
       const pull = highlighted.has(mark.id) ? 0.92 : 1;
       el.style.transform = `translate3d(${mark.x}px, ${mark.y}px, 0) scale(${behind ? 0.86 : pull})`;
-      el.style.opacity = behind ? "0.18" : highlighted.size && !highlighted.has(mark.id) && mark.kind === "artefact" ? "0.28" : "1";
-      el.style.zIndex = String(Math.round((1 - mark.z) * 20));
-      el.hidden = behind && mark.kind === "artefact";
+      el.style.opacity = behind
+          ? "0"
+          : highlighted.size && !highlighted.has(mark.id) && mark.kind === "artefact"
+            ? "0.38"
+            : "1";
+      el.style.zIndex = String(40 + Math.round((1 - mark.z) * 20));
+      el.hidden = behind;
+      el.style.pointerEvents = behind ? "none" : "auto";
     });
   }, [highlighted]);
 
@@ -223,7 +228,23 @@ export function GlobalSignalField() {
       </div>
 
       <p className="globe__hint">Drag to rotate. Touch to explore. Artefacts sit on signal routes, not in orbit noise.</p>
-      <div className="globe__rail">
+      <div className="globe__rail" aria-label="Locations">
+        {GLOBE_NODES.map((node) => (
+          <button
+            key={node.id}
+            type="button"
+            className={focus === node.id || hover === node.id ? "is-on" : undefined}
+            data-cursor="explore-signals"
+            onClick={() => focusNode(node.id)}
+            onPointerEnter={() => setHover(node.id)}
+            onPointerLeave={() => setHover(null)}
+          >
+            <em>{node.role}</em>
+            {node.name}
+          </button>
+        ))}
+      </div>
+      <div className="globe__rail" aria-label="Artefacts">
         {ORBITING_ARTEFACTS.map((item) => (
           <Link key={item.id} href={item.href} data-cursor={item.cursor}>
             <em>{item.number}</em>

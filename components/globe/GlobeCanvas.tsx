@@ -178,12 +178,13 @@ function Projector({
     const project = (id: string, lat: number, lng: number, altitude: number, kind: ProjectedMark["kind"]) => {
       latLngToVector(lat, lng, altitude, scratch);
       scratch.applyMatrix4(group.current!.matrixWorld);
+      const facing = scratch.clone().normalize().dot(camera.position.clone().normalize()) > 0.12;
       scratch.project(camera);
       marks.push({
         id,
         x: (scratch.x * 0.5 + 0.5) * size.width,
         y: (-scratch.y * 0.5 + 0.5) * size.height,
-        z: scratch.z,
+        z: facing ? scratch.z : 2,
         kind,
       });
     };
@@ -230,8 +231,8 @@ function Scene({ rotation, focus, hover, dense, dissolving, onProject }: ScenePr
 export function GlobeCanvas(props: SceneProps) {
   return (
     <Canvas
-      dpr={[1, 1.4]}
-      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+      dpr={[1, 1.25]}
+      gl={{ antialias: true, alpha: true, powerPreference: "default", failIfMajorPerformanceCaveat: false }}
       camera={{ position: [0, 0.15, 3.35], fov: 38 }}
       onCreated={({ gl }) => {
         gl.setClearColor("#080808", 0);
