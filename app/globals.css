@@ -1799,12 +1799,12 @@ a {
 }
 
 .rack {
-  --rack-r: min(34vw, 340px);
+  --rack-r: min(38vw, 390px);
   position: absolute;
   inset: 0;
   z-index: 5;
   overflow: hidden;
-  perspective: 1500px;
+  perspective: 1600px;
   perspective-origin: 50% 46%;
   cursor: grab;
   touch-action: none;
@@ -1831,67 +1831,121 @@ a {
 
 .rack__core {
   position: absolute;
-  width: 22px;
-  height: 22px;
-  margin: -11px;
+  width: 18px;
+  height: 18px;
+  margin: -9px;
   border-radius: 50%;
   background: #e10600;
-  box-shadow: 0 0 48px 18px rgba(225, 6, 0, 0.42);
+  box-shadow: 0 0 60px 22px rgba(225, 6, 0, 0.38);
+}
+
+.rack__ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--rack-r) * 2);
+  height: calc(var(--rack-r) * 2);
+  margin: calc(var(--rack-r) * -1);
+  border: 1px solid rgba(225, 6, 0, 0.2);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.rack__cell {
+  position: absolute;
+  left: -16px;
+  top: -20px;
+  width: 32px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(225, 6, 0, 0.28);
+  background: rgba(5, 5, 7, 0.55);
+  color: rgba(225, 6, 0, 0.55);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  pointer-events: none;
 }
 
 .rack__print {
+  --face: 0.4;
   position: absolute;
-  left: -64px;
-  top: -86px;
-  width: 128px;
-  height: 172px;
-  display: grid;
-  grid-template-rows: 1fr auto;
-  align-items: stretch;
-  padding: 10px;
+  left: -52px;
+  top: -70px;
+  width: 104px;
+  height: 140px;
+  padding: 0;
   appearance: none;
-  border: 1px solid rgba(244, 244, 240, 0.16);
-  background:
-    linear-gradient(180deg, rgba(225, 6, 0, 0.08), transparent 42%),
-    #0c0c10;
+  border: 0;
+  background: transparent;
   color: #f4f4f0;
   cursor: pointer;
   transform-style: preserve-3d;
+}
+
+.rack__recto,
+.rack__verso {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 8px 10px 10px;
+  border: 1px solid rgba(244, 244, 240, 0.16);
+  background:
+    repeating-linear-gradient(90deg, transparent 0 7px, rgba(225, 6, 0, 0.18) 7px 9px) 0 0 / 9px 100% no-repeat,
+    linear-gradient(180deg, rgba(225, 6, 0, calc(0.05 + var(--face) * 0.28)), #0c0c10 46%);
   backface-visibility: hidden;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
 }
 
-.rack__print.kind-hq {
-  left: -72px;
-  top: -98px;
-  width: 144px;
-  height: 196px;
+.rack__verso {
+  align-content: start;
+  gap: 6px;
+  background: #140808;
+  color: rgba(244, 244, 240, 0.72);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  white-space: pre-line;
+  transform: rotateY(180deg);
 }
 
-.rack__print.kind-product {
+.rack__print.kind-product .rack__recto {
   border-color: rgba(225, 6, 0, 0.7);
 }
 
-.rack__print strong {
+.rack__recto em {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 8px;
+  font-style: normal;
+  letter-spacing: 0.16em;
+  color: rgba(225, 6, 0, 0.7);
+}
+
+.rack__recto strong {
   align-self: center;
   justify-self: center;
-  font-size: clamp(22px, 3vw, 34px);
+  font-size: clamp(20px, 2.6vw, 30px);
   font-weight: 800;
   letter-spacing: -0.08em;
   color: #e10600;
+  opacity: calc(0.35 + var(--face) * 0.65);
 }
 
-.rack__print span {
+.rack__recto span {
   display: grid;
   gap: 3px;
   text-align: left;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: -0.05em;
   line-height: 1;
 }
 
-.rack__print small {
+.rack__recto small,
+.rack__verso small {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 8px;
   font-weight: 500;
@@ -1899,23 +1953,38 @@ a {
   color: #e10600;
 }
 
-.rack__face {
-  width: 100%;
-  aspect-ratio: 1;
+.rack__verso b {
+  display: block;
+  font-size: 13px;
+  letter-spacing: -0.04em;
+  color: #f4f4f0;
 }
 
-.rack__print.is-hot {
+.rack__face {
+  width: 72%;
+  justify-self: center;
+  align-self: center;
+}
+
+.rack__print.is-hot .rack__recto {
   border-color: #e10600;
   box-shadow: 0 0 0 1px #e10600, 0 0 28px rgba(225, 6, 0, 0.5);
-  z-index: 2;
 }
 
-.rack__print.is-shot {
+.rack__print.is-shot .rack__recto {
   box-shadow: inset 0 0 0 1px #e10600;
 }
 
 .rack__print.is-dim {
-  opacity: 0.16;
+  opacity: 0.14;
+}
+
+.rack__line {
+  margin: 0;
+  max-width: 240px;
+  font-size: 14px;
+  letter-spacing: -0.03em;
+  color: rgba(244, 244, 240, 0.7);
 }
 
 .rack__chrome {
@@ -2165,26 +2234,22 @@ a {
   }
 
   .rack {
-    --rack-r: min(42vw, 220px);
+    --rack-r: min(46vw, 240px);
   }
 
   .rack__print {
-    left: -46px;
-    top: -62px;
-    width: 92px;
-    height: 124px;
-    padding: 7px;
+    left: -38px;
+    top: -52px;
+    width: 76px;
+    height: 104px;
   }
 
-  .rack__print.kind-hq {
-    left: -52px;
-    top: -70px;
-    width: 104px;
-    height: 140px;
-  }
-
-  .rack__print span {
+  .rack__recto span {
     font-size: 10px;
+  }
+
+  .rack__line {
+    display: none;
   }
 
   .rack__chrome {

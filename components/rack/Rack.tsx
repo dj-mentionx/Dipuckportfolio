@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Portrait } from "@/components/compose/Portrait";
-import { matchesFilter, RACK_PRINTS, type RackFilter, type RackPrint } from "@/lib/rack";
+import { matchesFilter, RACK_CELLS, RACK_PRINTS, RACK_RINGS, type RackFilter, type RackPrint } from "@/lib/rack";
 
 type RackProps = {
   onEnter: (chapter: "about" | "work" | "bomb" | "contact", exhibit?: string) => void;
@@ -16,7 +16,7 @@ export function Rack({ onEnter, onLot, onClassic, quiet = false, visited = [] }:
   const wrapRef = useRef<HTMLDivElement>(null);
   const rigRef = useRef<HTMLDivElement>(null);
   const home = RACK_PRINTS.find((print) => print.id === "hq");
-  const ang = useRef({ yaw: home ? -home.yaw : 0, pitch: 8, vy: 0, vp: 0 });
+  const ang = useRef({ yaw: home ? -home.yaw : 0, pitch: 10, vy: 0, vp: 0 });
   const drag = useRef({ on: false, lx: 0, ly: 0, moved: 0 });
   const look = useRef<{ yaw: number; pitch: number } | null>(null);
   const quietRef = useRef(quiet);
@@ -26,9 +26,16 @@ export function Rack({ onEnter, onLot, onClassic, quiet = false, visited = [] }:
   const reducedRef = useRef(false);
 
   function paint() {
-    if (!rigRef.current) return;
+    const rig = rigRef.current;
+    if (!rig) return;
     const { yaw, pitch } = ang.current;
-    rigRef.current.style.transform = `rotateX(${pitch}deg) rotateY(${yaw}deg)`;
+    rig.style.transform = `rotateX(${pitch}deg) rotateY(${yaw}deg)`;
+    rig.querySelectorAll<HTMLElement>("[data-yaw]").forEach((node) => {
+      const py = Number(node.dataset.yaw);
+      const pp = Number(node.dataset.pitch);
+      const face = Math.max(0, Math.cos(((yaw + py) * Math.PI) / 180) * Math.cos(((pitch + pp) * Math.PI) / 180));
+      node.style.setProperty("--face", face.toFixed(3));
+    });
   }
 
   useEffect(() => {
@@ -51,7 +58,7 @@ export function Rack({ onEnter, onLot, onClassic, quiet = false, visited = [] }:
       drag.current.lx = event.clientX;
       drag.current.ly = event.clientY;
       ang.current.yaw += dx * 0.38;
-      ang.current.pitch = Math.max(-38, Math.min(38, ang.current.pitch - dy * 0.28));
+      ang.current.pitch = Math.max(-42, Math.min(42, ang.current.pitch - dy * 0.28));
       ang.current.vy = dx * 0.18;
       ang.current.vp = -dy * 0.12;
       paint();
@@ -63,7 +70,7 @@ export function Rack({ onEnter, onLot, onClassic, quiet = false, visited = [] }:
       event.preventDefault();
       look.current = null;
       ang.current.yaw += event.deltaX * 0.08;
-      ang.current.pitch = Math.max(-38, Math.min(38, ang.current.pitch - event.deltaY * 0.04));
+      ang.current.pitch = Math.max(-42, Math.min(42, ang.current.pitch - event.deltaY * 0.04));
       paint();
     };
 
@@ -79,8 +86,8 @@ export function Rack({ onEnter, onLot, onClassic, quiet = false, visited = [] }:
         return;
       }
       if (drag.current.on || reducedRef.current) return;
-      ang.current.yaw += ang.current.vy + 0.045;
-      ang.current.pitch = Math.max(-38, Math.min(38, ang.current.pitch + ang.current.vp));
+      ang.current.yaw += ang.current.vy + 0.035;
+      ang.current.pitch = Math.max(-42, Math.min(42, ang.current.pitch + ang.current.vp));
       ang.current.vy *= 0.94;
       ang.current.vp *= 0.9;
       paint();
@@ -103,7 +110,7 @@ export function Rack({ onEnter, onLot, onClassic, quiet = false, visited = [] }:
   }, []);
 
   function face(print: RackPrint) {
-    look.current = { yaw: -print.yaw, pitch: Math.max(-28, Math.min(28, -print.pitch * 0.35)) };
+    look.current = { yaw: -print.yaw, pitch: Math.max(-24, Math.min(24, -print.pitch * 0.4)) };
     setHot(print.id);
   }
 
@@ -114,30 +121,63 @@ export function Rack({ onEnter, onLot, onClassic, quiet = false, visited = [] }:
   }
 
   const current = RACK_PRINTS.find((print) => print.id === hot) ?? RACK_PRINTS[0];
-  const index = RACK_PRINTS.findIndex((print) => print.id === hot) + 1;
+  const index = current.index + 1;
 
   return (
     <div ref={wrapRef} className={`rack ${quiet ? "is-quiet" : ""}`}>
       <div className="rack__stage">
         <div ref={rigRef} className="rack__rig">
           <div className="rack__core" aria-hidden />
+          {RACK_RINGS.meridians.map((deg) => (
+            <i key={`m-${deg}`} className="rack__ring rack__ring--meridian" style={{ transform: `rotateY(${deg}deg)` }} />
+          ))}
+          {RACK_RINGS.parallels.map((deg) => {
+            const rad = (deg * Math.PI) / 180;
+            return (
+              <i
+                key={`p-${deg}`}
+                className="rack__ring rack__ring--parallel"
+                style={{
+                  transform: `translateY(calc(var(--rack-r) * ${Math.sin(rad)})) rotateX(90deg) scale(${Math.cos(rad)})`,
+                }}
+              />
+            );
+          })}
+          {RACK_CELLS.map((cell) => (
+            <span
+              key={cell.id}
+              className="rack__cell"
+              style={{ transform: `rotateY(${cell.yaw}deg) rotateX(${cell.pitch}deg) translateZ(calc(var(--rack-r) * 0.62))` }}
+              aria-hidden
+            >
+              {String(cell.index + 1).padStart(2, "0")}
+            </span>
+          ))}
           {RACK_PRINTS.map((print) => (
             <button
               key={print.id}
               type="button"
+              data-yaw={print.yaw}
+              data-pitch={print.pitch}
               className={`rack__print kind-${print.kind} ${hot === print.id ? "is-hot" : ""} ${visited.includes(print.id) ? "is-shot" : ""} ${matchesFilter(print, filter) ? "" : "is-dim"}`}
-              style={{
-                transform: `rotateY(${print.yaw}deg) rotateX(${print.pitch}deg) translateZ(var(--rack-r))`,
-              }}
+              style={{ transform: `rotateY(${print.yaw}deg) rotateX(${print.pitch}deg) translateZ(var(--rack-r))` }}
               onMouseEnter={() => setHot(print.id)}
               onFocus={() => setHot(print.id)}
               onClick={() => pick(print)}
               aria-label={`Open ${print.label}`}
             >
-              {print.kind === "hq" ? <Portrait className="rack__face" /> : <strong>{print.figure || print.label.slice(0, 2)}</strong>}
-              <span>
+              <span className="rack__recto">
+                <em>{String(print.index + 1).padStart(2, "0")}</em>
+                {print.kind === "hq" ? <Portrait className="rack__face" /> : <strong>{print.figure || print.label.slice(0, 2)}</strong>}
+                <span>
+                  <small>{print.kicker}</small>
+                  {print.label}
+                </span>
+              </span>
+              <span className="rack__verso">
                 <small>{print.kicker}</small>
-                {print.label}
+                <b>{print.label}</b>
+                {print.verso}
               </span>
             </button>
           ))}
@@ -156,6 +196,7 @@ export function Rack({ onEnter, onLot, onClassic, quiet = false, visited = [] }:
           <small>{current.kicker}</small>
           {current.label}
         </p>
+        <p className="rack__line">{current.line}</p>
         <div className="rack__filters" role="tablist" aria-label="Print sets">
           {(
             [
@@ -179,9 +220,7 @@ export function Rack({ onEnter, onLot, onClassic, quiet = false, visited = [] }:
         </div>
       </div>
 
-      <p className="rack__hint">
-        Drag to rotate · Click a print
-      </p>
+      <p className="rack__hint">Drag to rotate · Click a print</p>
 
       <nav className="rack__strip" aria-label="Prints">
         {RACK_PRINTS.filter((print) => matchesFilter(print, filter)).map((print) => (

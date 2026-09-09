@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { CHAPTERS, type ChapterId } from "@/lib/compose";
 import { EXHIBITS } from "@/lib/exhibits";
+import { SITE } from "@/lib/site";
 import { CountUp } from "./CountUp";
 import { Portrait } from "./Portrait";
 import { Scramble } from "./Scramble";
@@ -41,7 +42,7 @@ export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to the
   const [open, setOpen] = useState<string | null>(exhibit || EXHIBITS[0]?.id || null);
 
   async function copyMail() {
-    await navigator.clipboard.writeText("rush2dipuck@gmail.com");
+    await navigator.clipboard.writeText(SITE.person.email);
     setCopied(true);
     onSigned?.();
     window.setTimeout(() => setCopied(false), 1600);
@@ -67,7 +68,7 @@ export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to the
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
       >
         <p className="chapter__ghost" aria-hidden>
-          {id === "about" ? <CountUp to={13} /> : data.figure}
+          {id === "about" ? <CountUp to={SITE.person.years} /> : data.figure}
         </p>
         <p className="chapter__kicker">{data.kicker}</p>
         {id === "about" ? (
@@ -141,11 +142,11 @@ export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to the
         {id === "contact" ? (
           <motion.div className="chapter__links" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}>
             <button type="button" className="chapter__mail" onClick={copyMail}>
-              rush2dipuck@gmail.com
+              {SITE.person.email}
               <span>{copied ? "copied" : "copy"}</span>
             </button>
-            <a href="https://www.linkedin.com/in/dipuckjones/" target="_blank" rel="noreferrer">
-              linkedin.com/in/dipuckjones
+            <a href={SITE.person.linkedin} target="_blank" rel="noreferrer">
+              {SITE.person.linkedinLabel}
             </a>
           </motion.div>
         ) : null}
