@@ -92,7 +92,7 @@ export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to exp
         {id === "bomb" ? null : <KineticTitle text={data.title} />}
         {id === "bomb" ? (
           <MentionStory onScan={onScan} onClose={onClose} backLabel={backLabel} />
-        ) : (
+        ) : id === "contact" ? null : (
           data.lines.map((line, index) => (
             <p key={line} className="chapter__copy">
               <Scramble text={line} delay={420 + index * 160} />
