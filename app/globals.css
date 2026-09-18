@@ -1021,6 +1021,9 @@ a {
   opacity: 0.35;
   pointer-events: none;
 }
+
+.compose.is-held .compose__grid,
+.compose.is-held .ticker__track {
   animation-play-state: paused;
 }
 
@@ -3317,14 +3320,6 @@ a {
   .brand__glow,
   .brand-word__dipuck,
   .brand-word__jones {
-    animation: none;
-  }
-}
-  .lot__hero,
-  .lot__plot,
-  .lot__tag,
-  .xp__card,
-  .xp__chip {
     animation: none;
   }
 }
