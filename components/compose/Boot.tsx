@@ -2,14 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Portrait } from "./Portrait";
+import { BrandMark } from "./BrandMark";
 
 type BootProps = {
   onDone: () => void;
 };
-
-const DIPUCK = "DIPUCK".split("");
-const JONES = "JONES".split("");
 
 export function Boot({ onDone }: BootProps) {
   const locked = useRef(false);
@@ -42,7 +39,7 @@ export function Boot({ onDone }: BootProps) {
 
   useEffect(() => {
     if (!named) return;
-    const id = window.setTimeout(() => finishRef.current(), 2400);
+    const id = window.setTimeout(() => finishRef.current(), 2600);
     return () => window.clearTimeout(id);
   }, [named]);
 
@@ -61,17 +58,6 @@ export function Boot({ onDone }: BootProps) {
       />
       <p className="boot__kicker">BERLIN</p>
 
-      {named ? (
-        <motion.div
-          className="boot__face"
-          initial={{ opacity: 0, scale: 1.08 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <Portrait live />
-        </motion.div>
-      ) : null}
-
       <AnimatePresence>
         {!named ? (
           <motion.div
@@ -80,53 +66,35 @@ export function Boot({ onDone }: BootProps) {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-          <motion.p
-            className="boot__count"
-            initial={{ scale: 2.4, opacity: 0, skewX: -18, y: 40 }}
-            animate={{ scale: 1, opacity: 1, skewX: 0, y: 0 }}
-            exit={{ scale: 0.35, opacity: 0, skewX: 22, y: -80 }}
-            transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
-          >
-            0{count}
-          </motion.p>
+            <motion.p
+              className="boot__count"
+              initial={{ scale: 2.4, opacity: 0, skewX: -18, y: 40 }}
+              animate={{ scale: 1, opacity: 1, skewX: 0, y: 0 }}
+              exit={{ scale: 0.35, opacity: 0, skewX: 22, y: -80 }}
+              transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
+            >
+              0{count}
+            </motion.p>
           </motion.div>
         ) : (
-          <motion.div key="name" className="boot__mark">
-            <h1 className="boot__lockup" aria-label="Dipuck Jones">
-              <span className="boot__row">
-                {DIPUCK.map((ch, i) => (
-                  <motion.span
-                    key={`d-${ch}-${i}`}
-                    initial={{ y: "120%", rotateX: 80, opacity: 0 }}
-                    animate={{ y: "0%", rotateX: 0, opacity: 1 }}
-                    transition={{ delay: i * 0.05, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    {ch}
-                  </motion.span>
-                ))}
-              </span>
-              <span className="boot__row boot__row--red">
-                {JONES.map((ch, i) => (
-                  <motion.span
-                    key={`j-${ch}-${i}`}
-                    initial={{ y: "-120%", rotateX: -80, opacity: 0 }}
-                    animate={{ y: "0%", rotateX: 0, opacity: 1 }}
-                    transition={{ delay: 0.28 + i * 0.05, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    {ch}
-                  </motion.span>
-                ))}
-              </span>
-            </h1>
+          <motion.div
+            key="name"
+            className="boot__mark"
+            initial={{ opacity: 0, scale: 0.86, rotateX: 18 }}
+            animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <BrandMark variant="hero" priority />
           </motion.div>
         )}
       </AnimatePresence>
+
       {named ? (
         <motion.div
           className="boot__flood"
           initial={{ scale: 0, opacity: 1 }}
           animate={{ scale: 28, opacity: [1, 1, 0] }}
-          transition={{ delay: 1.45, duration: 0.8, times: [0, 0.55, 1], ease: [0.7, 0, 0.2, 1] }}
+          transition={{ delay: 1.55, duration: 0.8, times: [0, 0.55, 1], ease: [0.7, 0, 0.2, 1] }}
         />
       ) : null}
 
@@ -135,7 +103,7 @@ export function Boot({ onDone }: BootProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: named ? 1 : 0 }}
       >
-        Drag. Then walk.
+        Drag the sphere. Walk the street.
       </motion.p>
       <motion.button type="button" className="boot__cta" onClick={finish} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
         SKIP INTRO

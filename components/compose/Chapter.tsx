@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { CHAPTERS, type ChapterId } from "@/lib/compose";
 import { EXHIBITS } from "@/lib/exhibits";
 import { SITE } from "@/lib/site";
+import { BrandMark } from "./BrandMark";
 import { CountUp } from "./CountUp";
 import { MentionStory } from "./MentionStory";
 import { Portrait } from "./Portrait";
@@ -89,7 +90,8 @@ export function Chapter({ id, exhibit, onClose, onScan, backLabel = "Back to exp
             <Portrait live />
           </motion.div>
         ) : null}
-        {id === "bomb" ? null : <KineticTitle text={data.title} />}
+        {id === "about" ? <BrandMark variant="panel" className="chapter__brand" /> : null}
+        {id === "bomb" ? null : id === "about" ? null : <KineticTitle text={data.title} />}
         {id === "bomb" ? (
           <MentionStory onScan={onScan} onClose={onClose} backLabel={backLabel} />
         ) : id === "contact" ? null : (

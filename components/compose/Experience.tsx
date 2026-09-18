@@ -18,6 +18,7 @@ import {
   type ShiftState,
 } from "@/lib/shift";
 import { Boot } from "./Boot";
+import { BrandMark } from "./BrandMark";
 import { Chapter } from "./Chapter";
 import { Scan } from "./Scan";
 
@@ -193,6 +194,9 @@ export function Experience() {
             />
           ) : null}
           {surface === "field" ? <Field highlight={highlight} onPick={onPick} /> : null}
+          <button type="button" className="compose__brand" onClick={() => go("sphere")} aria-label="Dipuck Jones — Sphere">
+            <BrandMark variant="nav" />
+          </button>
           <nav className="compose__nav" aria-label="Worlds">
             <button type="button" className={onSphere && mode === "sphere" ? "is-on" : ""} onClick={() => go("sphere")}>
               Sphere
