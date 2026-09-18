@@ -148,14 +148,14 @@ a {
   pointer-events: auto;
   position: absolute;
   z-index: 30;
-  top: 14px;
+  top: 16px;
   left: 18px;
   appearance: none;
   border: 0;
   padding: 0;
   background: transparent;
   cursor: pointer;
-  width: min(168px, 28vw);
+  width: auto;
 }
 
 .compose__nav button {
@@ -232,149 +232,122 @@ a {
   place-items: center;
   overflow: visible;
   pointer-events: none;
-  perspective: 1200px;
-  transform-style: preserve-3d;
 }
 
 .brand {
   position: relative;
   display: grid;
-  place-items: center;
-  width: 100%;
-  isolation: isolate;
-  transform-style: preserve-3d;
+  gap: 0.08em;
+  justify-items: center;
+  margin: 0;
+  width: max-content;
+  max-width: 100%;
+  line-height: 0.86;
+  background: transparent;
 }
 
-.brand__metal {
-  width: 100%;
-  height: auto;
-  display: block;
-  filter:
-    drop-shadow(0 18px 28px rgba(0, 0, 0, 0.55))
-    drop-shadow(0 0 28px rgba(225, 6, 0, 0.22));
-  animation: brand-float 4.8s ease-in-out infinite;
+.brand__dipuck,
+.brand__jones {
+  display: flex;
+  justify-content: center;
+  margin: 0;
 }
 
-.brand__gleam {
-  pointer-events: none;
-  position: absolute;
-  inset: 8% 4%;
-  background: linear-gradient(
-    115deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.08) 46%,
-    rgba(225, 6, 0, 0.18) 50%,
-    rgba(255, 255, 255, 0.12) 54%,
-    transparent 70%
-  );
-  mix-blend-mode: screen;
-  transform: translateX(-120%);
-  animation: brand-gleam 3.8s ease-in-out infinite;
+.brand__dipuck i,
+.brand__jones i {
+  font-style: normal;
+  display: inline-block;
 }
 
-.brand__glow {
-  pointer-events: none;
-  position: absolute;
-  inset: 18% 10%;
-  background: radial-gradient(ellipse at center, rgba(225, 6, 0, 0.28), transparent 68%);
-  filter: blur(18px);
-  z-index: -1;
-  animation: brand-pulse 3.2s ease-in-out infinite;
+.brand__dipuck {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.07em;
+  color: #f4f4f0;
+}
+
+.brand__jones {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.48em;
+  padding-left: 0.48em;
+  color: #e10600;
 }
 
 .brand--hero {
   width: min(92vw, 920px);
 }
 
+.brand--hero .brand__dipuck {
+  font-size: clamp(56px, 14vw, 168px);
+}
+
+.brand--hero .brand__jones {
+  font-size: clamp(16px, 3.2vw, 36px);
+}
+
+.brand--hero .brand__dipuck i {
+  animation: brand-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.brand--hero .brand__dipuck i:nth-child(1) { animation-delay: 0.02s; }
+.brand--hero .brand__dipuck i:nth-child(2) { animation-delay: 0.07s; }
+.brand--hero .brand__dipuck i:nth-child(3) { animation-delay: 0.12s; }
+.brand--hero .brand__dipuck i:nth-child(4) { animation-delay: 0.17s; }
+.brand--hero .brand__dipuck i:nth-child(5) { animation-delay: 0.22s; }
+.brand--hero .brand__dipuck i:nth-child(6) { animation-delay: 0.27s; }
+
+.brand--hero .brand__jones i {
+  animation: brand-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.brand--hero .brand__jones i:nth-child(1) { animation-delay: 0.3s; }
+.brand--hero .brand__jones i:nth-child(2) { animation-delay: 0.35s; }
+.brand--hero .brand__jones i:nth-child(3) { animation-delay: 0.4s; }
+.brand--hero .brand__jones i:nth-child(4) { animation-delay: 0.45s; }
+.brand--hero .brand__jones i:nth-child(5) { animation-delay: 0.5s; }
+
 .brand--nav {
-  width: 100%;
+  width: auto;
 }
 
-.brand--nav .brand__metal {
-  animation: none;
-  filter: drop-shadow(0 0 12px rgba(225, 6, 0, 0.28));
-}
-
-.brand--nav .brand__gleam {
-  animation-duration: 5.5s;
-}
-
-.brand--panel {
-  width: min(320px, 70%);
-  margin: 8px 0 18px;
-}
-
-.brand--panel .brand__metal {
-  animation: brand-float 5.4s ease-in-out infinite;
-}
-
-.chapter__brand {
-  margin-top: 8px;
-}
-
-.brand-word {
-  margin: 0;
-  display: grid;
-  gap: 0.12em;
-  justify-items: center;
-  line-height: 0.88;
-}
-
-.brand-word__dipuck,
-.brand-word__jones {
-  background: linear-gradient(
-    115deg,
-    #6e6e78 0%,
-    #f4f4f0 16%,
-    #a8a8b2 28%,
-    #e10600 46%,
-    #f4f4f0 58%,
-    #8a8a94 74%,
-    #c8c8d0 100%
-  );
-  background-size: 220% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: brand-sheen 5s linear infinite;
-  filter: drop-shadow(0 2px 0 rgba(90, 0, 0, 0.55)) drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
-}
-
-.brand-word__dipuck {
-  font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: clamp(42px, 8vw, 96px);
-  font-weight: 800;
+.brand--nav .brand__dipuck {
+  font-size: 18px;
   letter-spacing: -0.06em;
 }
 
-.brand-word__jones {
-  font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: clamp(14px, 2.4vw, 28px);
-  font-weight: 500;
-  letter-spacing: 0.42em;
-  padding-left: 0.42em;
+.brand--nav .brand__jones {
+  font-size: 8px;
+  letter-spacing: 0.4em;
+  padding-left: 0.4em;
 }
 
-@keyframes brand-gleam {
-  0%, 35% { transform: translateX(-120%); opacity: 0; }
-  45% { opacity: 1; }
-  58% { transform: translateX(120%); opacity: 0.7; }
-  100% { transform: translateX(120%); opacity: 0; }
+.brand--panel {
+  margin: 10px 0 18px;
+  justify-items: start;
 }
 
-@keyframes brand-float {
-  0%, 100% { transform: translateY(0) rotateX(0deg); }
-  50% { transform: translateY(-8px) rotateX(4deg); }
+.brand--panel .brand__dipuck {
+  font-size: clamp(36px, 6vw, 64px);
 }
 
-@keyframes brand-pulse {
-  0%, 100% { opacity: 0.55; transform: scale(0.96); }
-  50% { opacity: 1; transform: scale(1.05); }
+.brand--panel .brand__jones {
+  font-size: clamp(12px, 1.8vw, 18px);
 }
 
-@keyframes brand-sheen {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 220% 50%; }
+.chapter__brand {
+  margin-top: 10px;
+}
+
+@keyframes brand-rise {
+  from {
+    opacity: 0;
+    transform: translateY(42%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .boot__count-wrap {
@@ -3315,11 +3288,8 @@ a {
   .lot__tag,
   .xp__card,
   .xp__chip,
-  .brand__metal,
-  .brand__gleam,
-  .brand__glow,
-  .brand-word__dipuck,
-  .brand-word__jones {
+  .brand--hero .brand__dipuck i,
+  .brand--hero .brand__jones i {
     animation: none;
   }
 }
